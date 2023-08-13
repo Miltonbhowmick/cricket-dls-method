@@ -1,0 +1,14 @@
+{
+  "nuxt.isNuxtApp": true,
+  "editor.formatOnSave": true,
+	"vetur.format.defaultFormatter.html": "esbenp.prettier-vscode",
+	"[vue]": {
+			"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[ts]": {
+			"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[javascript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	}
+}
