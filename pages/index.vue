@@ -15,7 +15,16 @@
 		</section>
 	</div>
 </template>
-<script setup></script>
+<script setup>
+const G50 = 245;
+
+var caseData = reactive({
+	numberOfOvers: 50,
+	teamOneScore: 0,
+	teamOneResource: 0,
+	teamTwoResource: 0,
+});
+</script>
 <style scoped lang="scss">
 .main {
 	display: flex;
