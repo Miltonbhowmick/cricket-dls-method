@@ -9,15 +9,34 @@
 					<div class="inputs">
 						<div>
 							<label>team1 score</label>
-							<input type="text" v-model="caseData.teamOneScore" />
+							<input v-model="caseData.teamOneScore" type="number" />
+							<span> &#128551;</span>
+						</div>
+						<div>
+							<label>team1 overs complete</label>
+							<input
+								v-model="caseData.teamOneOverComplete"
+								type="number"
+								step=".01"
+							/>
+							<span
+								v-if="caseData.teamOneOverComplete > caseData.numberOfOvers"
+							>
+								&#128564;</span
+							>
 						</div>
 						<div>
 							<label>team1 overs left</label>
-							<input type="text" v-model="caseData.teamOneResource" />
+							<input
+								disabled
+								v-model="caseData.teamOneOverLeft"
+								type="number"
+							/>
 						</div>
 						<div>
 							<label>team1 fall of wickets</label>
-							<input type="text" v-model="caseData.teamTwoResource" />
+							<input v-model="caseData.teamOneWicketFall" type="number" />
+							<span v-if="caseData.teamOneWicketFall > 10">&#128564;</span>
 						</div>
 						<hr />
 					</div>
@@ -29,15 +48,39 @@
 	</div>
 </template>
 <script setup>
+import adjustedTable from "../utils/adjustedTable.json";
 const G50 = 245;
 
 var caseData = reactive({
 	numberOfOvers: 50,
 	teamOneScore: 0,
+	teamOneOverComplete: 0,
+	teamOneOverLeft: 0,
+	teamOneWicketFall: 0,
 	teamOneResource: 0,
 	teamTwoResource: 0,
 });
-var answers = reactive(null);
+var answers = reactive({});
+
+const isMidOver = (over) => {
+	if (over) {
+		return over - parseInt(over) != 0 ? true : false;
+	}
+	return false;
+};
+
+const getAdjustedTableType = (over) => {
+	if (isMidOver(over)) {
+		if (40 <= over && over <= 50) return "fiftyToForty";
+		else if (30 <= over && over <= 40) return "fortyToThirty";
+		else if (20 <= over && over <= 30) return "thirtyToTwenty";
+		else if (10 <= over && over <= 20) return "twentyToTen";
+		else if (0 <= over && over <= 10) return "tenToZero";
+	} else {
+		return "fiftyToZero";
+	}
+};
+
 const calculationDLS = (type) => {
 	if (type === 0) {
 		// Formula:
@@ -49,6 +92,39 @@ const calculationDLS = (type) => {
 		return;
 	}
 };
+
+watchEffect(() => {
+	if (caseData.teamOneOverComplete >= 0) {
+		if (caseData.teamOneOverComplete > caseData.numberOfOvers) return;
+		if (isMidOver(caseData.teamOneOverComplete)) {
+			console.log("><<> mid");
+			let decimal =
+				caseData.teamOneOverComplete - parseInt(caseData.teamOneOverComplete);
+			let leftDecimal = 0.6 - decimal;
+			caseData.teamOneOverLeft =
+				caseData.numberOfOvers -
+				parseInt(caseData.teamOneOverComplete) -
+				1 +
+				parseFloat(leftDecimal.toFixed(1));
+		} else {
+			caseData.teamOneOverLeft =
+				caseData.numberOfOvers - caseData.teamOneOverComplete;
+		}
+		var table = adjustedTable[getAdjustedTableType(caseData.teamOneOverLeft)];
+		var percentageObj = table.find(
+			(el) => el.overs === String(caseData.teamOneOverLeft)
+		);
+		console.log(".....", percentageObj[String(caseData.teamOneWicketFall)]);
+	}
+});
+
+watchEffect(() => {
+	// if ((caseData.teamOneOverLeft, caseData.teamOneWicketFall))
+	// 	console.log(
+	// 		"===============aci",
+	// 		adjustedTable["fiftyToZero"].filter((el) => parseInt(el.overs) === 49)
+	// 	);
+});
 </script>
 <style scoped lang="scss">
 .main {
