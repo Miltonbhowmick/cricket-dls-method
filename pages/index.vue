@@ -9,7 +9,7 @@
 					<div class="inputs">
 						<div>
 							<label>team1 score</label>
-							<input v-model="caseData.teamOneScore" type="number" />
+							<input v-model="caseData.teamOneScore" type="number" min="0" />
 							<span> &#128551;</span>
 						</div>
 						<div>
@@ -18,6 +18,7 @@
 								v-model="caseData.teamOneOverComplete"
 								type="number"
 								step=".01"
+								min="0"
 							/>
 							<span
 								v-if="caseData.teamOneOverComplete > caseData.numberOfOvers"
@@ -31,16 +32,57 @@
 								disabled
 								v-model="caseData.teamOneOverLeft"
 								type="number"
+								min="0"
 							/>
 						</div>
 						<div>
 							<label>team1 fall of wickets</label>
-							<input v-model="caseData.teamOneWicketFall" type="number" />
+							<input
+								v-model="caseData.teamOneWicketFall"
+								type="number"
+								min="0"
+								max="10"
+							/>
 							<span v-if="caseData.teamOneWicketFall > 10">&#128564;</span>
+						</div>
+						<div>
+							<label>team1 resource available</label>
+							<input
+								disabled
+								v-model="caseData.teamOneResource"
+								type="number"
+								min="0"
+							/>
+						</div>
+						<div>
+							<label>Cut and final over</label>
+							<input v-model="caseData.cutFinalOver" type="number" min="0" />
+						</div>
+						<div>
+							<label>team2 resource available</label>
+							<input
+								disabled
+								v-model="caseData.teamTwoResource"
+								type="number"
+								min="0"
+							/>
+						</div>
+						<div>
+							<label>team2 wicket fall</label>
+							<input
+								disabled
+								v-model="caseData.teamTwoWicketFall"
+								type="number"
+								min="0"
+							/>
+						</div>
+						<div>
+							<label>team2 wicket available: </label>
+							<span>{{ 10 - caseData.teamTwoWicketFall }}</span>
 						</div>
 						<hr />
 					</div>
-					<div class="answers" v-if="answers"></div>
+					<div class="answers" v-if="answers">{{ answers }}</div>
 					<button @click="calculationDLS(0)">submit</button>
 				</div>
 			</div>
@@ -57,8 +99,13 @@ var caseData = reactive({
 	teamOneOverComplete: 0,
 	teamOneOverLeft: 0,
 	teamOneWicketFall: 0,
+	teamOneSuspensionResource: 0,
+	teamOneResumptionResource: 0,
 	teamOneResource: 0,
 	teamTwoResource: 0,
+	cutFinalOver: 0,
+	teamTwoResource: 0,
+	teamTwoWicketFall: 0,
 });
 var answers = reactive({});
 
@@ -86,7 +133,9 @@ const calculationDLS = (type) => {
 		// Formula:
 		// Revised Score = S + G50 * (R2/R1) + 1
 		// Where, S is team one score, G50 is a standard score (245 total run) for a international criecket team
-		var divison = caseData.teamOneResource / caseData.teamTwoResource;
+		var divison =
+			Number(caseData.teamTwoResource) / Number(caseData.teamOneResource);
+		console.log("==a=sd=s=d", divison);
 		var revisedScore = caseData.teamOneScore + G50 * divison + 1;
 		answers["revised_score"] = revisedScore;
 		return;
@@ -97,7 +146,9 @@ watchEffect(() => {
 	if (caseData.teamOneOverComplete >= 0) {
 		if (caseData.teamOneOverComplete > caseData.numberOfOvers) return;
 		if (isMidOver(caseData.teamOneOverComplete)) {
-			console.log("><<> mid");
+			// Calculating left over if complete over is in mid over
+			// if complete over 46.3
+			// then left over 3.3
 			let decimal =
 				caseData.teamOneOverComplete - parseInt(caseData.teamOneOverComplete);
 			let leftDecimal = 0.6 - decimal;
@@ -110,20 +161,41 @@ watchEffect(() => {
 			caseData.teamOneOverLeft =
 				caseData.numberOfOvers - caseData.teamOneOverComplete;
 		}
+
+		// ICC adjusted table data
 		var table = adjustedTable[getAdjustedTableType(caseData.teamOneOverLeft)];
 		var percentageObj = table.find(
 			(el) => el.overs === String(caseData.teamOneOverLeft)
 		);
-		console.log(".....", percentageObj[String(caseData.teamOneWicketFall)]);
+		caseData.teamOneSuspensionResource =
+			percentageObj[String(caseData.teamOneWicketFall)];
 	}
 });
 
 watchEffect(() => {
-	// if ((caseData.teamOneOverLeft, caseData.teamOneWicketFall))
-	// 	console.log(
-	// 		"===============aci",
-	// 		adjustedTable["fiftyToZero"].filter((el) => parseInt(el.overs) === 49)
-	// 	);
+	if (caseData.cutFinalOver >= 0) {
+		var bigTable = adjustedTable["fiftyToZero"];
+		var percentageObj = bigTable.find(
+			(el) => el.overs === String(caseData.cutFinalOver)
+		);
+		caseData.teamTwoResource = percentageObj["0"];
+
+		var obj = bigTable.find(
+			(el) =>
+				el.overs === String(caseData.cutFinalOver - caseData.teamOneOverLeft)
+		);
+		console.log(">>>>", caseData.cutFinalOver - caseData.teamOneOverLeft);
+		// caseData.teamOneResumptionResource = obj[caseData.teamOneWicketFall];
+
+		console.log(
+			"dekh to",
+			caseData.teamOneSuspensionResource - caseData.teamOneResumptionResource,
+			caseData.teamOneResumptionResource,
+			caseData.teamOneSuspensionResource
+		);
+		caseData.teamOneResource =
+			caseData.teamOneSuspensionResource - caseData.teamOneResumptionResource;
+	}
 });
 </script>
 <style scoped lang="scss">
