@@ -95,12 +95,14 @@ const G50 = 245;
 
 var caseData = reactive({
 	numberOfOvers: 50,
+	startResource: 100,
 	teamOneScore: 0,
 	teamOneOverComplete: 0,
 	teamOneOverLeft: 0,
 	teamOneWicketFall: 0,
 	teamOneSuspensionResource: 0,
 	teamOneResumptionResource: 0,
+	teamOneLostResource: 0,
 	teamOneResource: 0,
 	teamTwoResource: 0,
 	cutFinalOver: 0,
@@ -134,7 +136,8 @@ const calculationDLS = (type) => {
 		// Revised Score = S + G50 * (R2/R1) + 1
 		// Where, S is team one score, G50 is a standard score (245 total run) for a international criecket team
 		var divison =
-			Number(caseData.teamTwoResource) / Number(caseData.teamOneResource);
+			(Number(caseData.teamTwoResource) - Number(caseData.teamOneResource)) /
+			100;
 		console.log("==a=sd=s=d", divison);
 		var revisedScore = caseData.teamOneScore + G50 * divison + 1;
 		answers["revised_score"] = revisedScore;
@@ -142,61 +145,75 @@ const calculationDLS = (type) => {
 	}
 };
 
-watchEffect(() => {
-	if (caseData.teamOneOverComplete >= 0) {
-		if (caseData.teamOneOverComplete > caseData.numberOfOvers) return;
-		if (isMidOver(caseData.teamOneOverComplete)) {
-			// Calculating left over if complete over is in mid over
-			// if complete over 46.3
-			// then left over 3.3
-			let decimal =
-				caseData.teamOneOverComplete - parseInt(caseData.teamOneOverComplete);
-			let leftDecimal = 0.6 - decimal;
-			caseData.teamOneOverLeft =
-				caseData.numberOfOvers -
-				parseInt(caseData.teamOneOverComplete) -
-				1 +
-				parseFloat(leftDecimal.toFixed(1));
-		} else {
-			caseData.teamOneOverLeft =
-				caseData.numberOfOvers - caseData.teamOneOverComplete;
+watch(
+	() => caseData.teamOneOverComplete,
+	(newVal, oldVal) => {
+		if (newVal && newVal >= 0) {
+			if (caseData.teamOneOverComplete > caseData.numberOfOvers) return;
+			if (isMidOver(caseData.teamOneOverComplete)) {
+				// Calculating left over if complete over is in mid over
+				// if complete over 46.3
+				// then left over 3.3
+				let decimal =
+					caseData.teamOneOverComplete - parseInt(caseData.teamOneOverComplete);
+				let leftDecimal = 0.6 - decimal;
+				caseData.teamOneOverLeft =
+					caseData.numberOfOvers -
+					parseInt(caseData.teamOneOverComplete) -
+					1 +
+					parseFloat(leftDecimal.toFixed(1));
+			} else {
+				caseData.teamOneOverLeft =
+					caseData.numberOfOvers - caseData.teamOneOverComplete;
+			}
+
+			// Get ICC adjusted table data
+			var table = adjustedTable[getAdjustedTableType(caseData.teamOneOverLeft)];
+			var percentageObj = table.find(
+				(el) => el.overs === String(caseData.teamOneOverLeft)
+			);
+			console.log("+++++", percentageObj["3"]);
+			// Suspension resource after distrubing moment
+			caseData.teamOneSuspensionResource =
+				percentageObj[String(caseData.teamOneWicketFall)];
 		}
-
-		// ICC adjusted table data
-		var table = adjustedTable[getAdjustedTableType(caseData.teamOneOverLeft)];
-		var percentageObj = table.find(
-			(el) => el.overs === String(caseData.teamOneOverLeft)
-		);
-		caseData.teamOneSuspensionResource =
-			percentageObj[String(caseData.teamOneWicketFall)];
 	}
-});
+);
 
-watchEffect(() => {
-	if (caseData.cutFinalOver >= 0) {
-		var bigTable = adjustedTable["fiftyToZero"];
-		var percentageObj = bigTable.find(
-			(el) => el.overs === String(caseData.cutFinalOver)
-		);
-		caseData.teamTwoResource = percentageObj["0"];
+watch(
+	() => caseData.cutFinalOver,
+	(newVal, oldVal) => {
+		console.log("+++++DSD", newVal, oldVal);
+		if (newVal && newVal >= 0) {
+			// Get ICC adjusted table
+			var bigTable = adjustedTable["fiftyToZero"];
+			// Get team 2 resource, R2
+			console.log(newVal);
+			var percentageObj = bigTable.find((el) => el.overs === String(newVal));
+			caseData.teamTwoResource = percentageObj["0"];
+			// Get team 1 resumption resource
+			var obj = bigTable.find(
+				(el) => el.overs === String(newVal - caseData.teamOneOverComplete)
+			);
+			caseData.teamOneResumptionResource =
+				obj[String(caseData.teamOneWicketFall)];
 
-		var obj = bigTable.find(
-			(el) =>
-				el.overs === String(caseData.cutFinalOver - caseData.teamOneOverLeft)
-		);
-		console.log(">>>>", caseData.cutFinalOver - caseData.teamOneOverLeft);
-		// caseData.teamOneResumptionResource = obj[caseData.teamOneWicketFall];
+			caseData.teamOneLostResource =
+				caseData.teamOneSuspensionResource - caseData.teamOneResumptionResource;
 
-		console.log(
-			"dekh to",
-			caseData.teamOneSuspensionResource - caseData.teamOneResumptionResource,
-			caseData.teamOneResumptionResource,
-			caseData.teamOneSuspensionResource
-		);
-		caseData.teamOneResource =
-			caseData.teamOneSuspensionResource - caseData.teamOneResumptionResource;
+			caseData.teamOneResource =
+				caseData.startResource - caseData.teamOneLostResource;
+		}
 	}
-});
+);
+
+watch(
+	() => caseData.teamOneWicketFall,
+	(newVal, oldVal) => {
+		if (newVal) {
+		}
+	}
+);
 </script>
 <style scoped lang="scss">
 .main {
