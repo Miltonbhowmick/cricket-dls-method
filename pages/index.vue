@@ -172,7 +172,6 @@ watch(
 			var percentageObj = table.find(
 				(el) => el.overs === String(caseData.teamOneOverLeft)
 			);
-			console.log("+++++", percentageObj["3"]);
 			// Suspension resource after distrubing moment
 			caseData.teamOneSuspensionResource =
 				percentageObj[String(caseData.teamOneWicketFall)];
@@ -188,12 +187,15 @@ watch(
 			// Get ICC adjusted table
 			var bigTable = adjustedTable["fiftyToZero"];
 			// Get team 2 resource, R2
-			console.log(newVal);
-			var percentageObj = bigTable.find((el) => el.overs === String(newVal));
+			var percentageObj = bigTable.find(
+				(el) => el.overs === String(caseData.cutFinalOver)
+			);
 			caseData.teamTwoResource = percentageObj["0"];
 			// Get team 1 resumption resource
 			var obj = bigTable.find(
-				(el) => el.overs === String(newVal - caseData.teamOneOverComplete)
+				(el) =>
+					el.overs ===
+					String(caseData.cutFinalOver - caseData.teamOneOverComplete)
 			);
 			caseData.teamOneResumptionResource =
 				obj[String(caseData.teamOneWicketFall)];
@@ -211,9 +213,41 @@ watch(
 	() => caseData.teamOneWicketFall,
 	(newVal, oldVal) => {
 		if (newVal) {
+			console.log(">>>>>", newVal);
+			// Get ICC adjusted table data
+			var table = adjustedTable[getAdjustedTableType(caseData.teamOneOverLeft)];
+			var percentageObj = table.find(
+				(el) => el.overs === String(caseData.teamOneOverLeft)
+			);
+			// Suspension resource after distrubing moment
+			caseData.teamOneSuspensionResource =
+				percentageObj[String(caseData.teamOneWicketFall)];
+
+			if (caseData.cutFinalOver) {
+				// Get team 1 resumption resource
+				var bigTable = adjustedTable["fiftyToZero"];
+				var obj = bigTable.find(
+					(el) =>
+						el.overs ===
+						String(caseData.cutFinalOver - caseData.teamOneOverComplete)
+				);
+				caseData.teamOneResumptionResource =
+					obj[String(caseData.teamOneWicketFall)];
+			}
+
+			caseData.teamOneLostResource =
+				caseData.teamOneSuspensionResource - caseData.teamOneResumptionResource;
+
+			caseData.teamOneResource =
+				caseData.startResource - caseData.teamOneLostResource;
 		}
 	}
 );
+
+onMounted(() => {
+	caseData.teamOneOverLeft =
+		caseData.numberOfOvers - caseData.teamOneOverComplete;
+});
 </script>
 <style scoped lang="scss">
 .main {
