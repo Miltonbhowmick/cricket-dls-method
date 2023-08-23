@@ -21,6 +21,7 @@
 
 					<div v-for="(item, index) in totalDelayTeamOne" :key="index">
 						<input placeholder="Cut and final over" />
+						<input id="teamOneWickets" placeholder="Team one wicket" />
 					</div>
 					<br />
 					<button v-if="teamOneDelay === true" @click="totalDelayTeamOne += 1">
