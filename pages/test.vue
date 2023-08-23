@@ -14,13 +14,34 @@
 					<label for="team1Delay">delay</label>
 				</div>
 				<div class="content">
-					<p>Match start at 50 overs</p>
-					<input v-for="(item, index) in totalDelayTeamOne" :key="index" />
+					<div>
+						<label for="overs">Match start at overs</label>
+						<input id="overs" placeholder="Match start overs" />
+					</div>
+
+					<div v-for="(item, index) in totalDelayTeamOne" :key="index">
+						<input placeholder="Cut and final over" />
+					</div>
+					<br />
 					<button v-if="teamOneDelay === true" @click="totalDelayTeamOne += 1">
 						v
 					</button>
-					<p>Score: 212</p>
-					<p>Wickets Fall: 3</p>
+					<div>
+						<label for="teamOneScore">Team 1 score</label>
+						<input id="teamOneScore" placeholder="Team one score" />
+					</div>
+					<div>
+						<label for="teamOneWickets">Team 1 wickets</label>
+						<input id="teamOneWickets" placeholder="Team one wicket" />
+					</div>
+					<div>
+						<label for="teamOneResource">Team 1 resource</label>
+						<input
+							id="teamOneResource"
+							placeholder="Team one resource, R1"
+							disabled
+						/>
+					</div>
 				</div>
 			</div>
 			<div class="team">
@@ -34,6 +55,28 @@
 					/>
 					<label for="team2Delay">delay</label>
 				</div>
+				<div class="content">
+					<div>
+						<label for="overs">Match start at overs</label>
+						<input id="overs" placeholder="Match start overs" />
+					</div>
+					<div class="content">
+						<div v-for="(item, index) in totalDelayTeamTwo" :key="index">
+							<input placeholder="Cut and final over" />
+						</div>
+						<br />
+						<button
+							v-if="teamTwoDelay === true"
+							@click="totalDelayTeamTwo += 1"
+						>
+							v
+						</button>
+						<div>
+							<label for="teamTwoWickets">Team 2 wickets</label>
+							<input id="teamTwoWickets" placeholder="Team two wicket" />
+						</div>
+					</div>
+				</div>
 			</div>
 		</section>
 	</div>
@@ -45,6 +88,15 @@ var teamTwoDelay = ref(false);
 
 var totalDelayTeamOne = ref(0);
 var totalDelayTeamTwo = ref(0);
+
+watch(
+	() => teamOneDelay.value,
+	(newVal, oldVal) => {}
+);
+watch(
+	() => teamTwoDelay.value,
+	(newVal, oldVal) => {}
+);
 </script>
 
 <style scoped lang="scss">
