@@ -63,6 +63,7 @@
 					<div class="content">
 						<div v-for="(item, index) in totalDelayTeamTwo" :key="index">
 							<input placeholder="Cut and final over" />
+							<input id="teamTwoWickets" placeholder="Team two wicket" />
 						</div>
 						<br />
 						<button
@@ -72,8 +73,12 @@
 							v
 						</button>
 						<div>
-							<label for="teamTwoWickets">Team 2 wickets</label>
-							<input id="teamTwoWickets" placeholder="Team two wicket" />
+							<label for="teamTwoResource">Team 2 resource</label>
+							<input
+								id="teamTwoResource"
+								placeholder="Team two resource, R2"
+								disabled
+							/>
 						</div>
 					</div>
 				</div>
