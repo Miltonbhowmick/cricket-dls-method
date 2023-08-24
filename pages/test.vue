@@ -20,6 +20,7 @@
 							id="overs"
 							placeholder="Match start overs"
 							v-model="teamOneStartOver"
+							:disabled="teamOneDelay"
 						/>
 					</div>
 					<div>
@@ -33,10 +34,21 @@
 
 					<div v-for="(item, index) in teamOneDelayList" :key="index">
 						<input
-							placeholder="Cut and final over"
-							v-model="teamOneDelayList[index]"
+							placeholder="Complete over"
+							v-model="teamOneDelayList[index].over"
+							:disabled="index !== teamOneDelayList.length - 1"
 						/>
-						<input id="teamOneWickets" placeholder="Team one wicket" />
+						<input
+							placeholder="Cut and final over"
+							v-model="teamOneDelayList[index].finalOverKey"
+							:disabled="index !== teamOneDelayList.length - 1"
+						/>
+						<input
+							id="teamOneWickets"
+							placeholder="Team one wicket"
+							v-model="teamOneDelayList[index].wicketsFallKey"
+							:disabled="index !== teamOneDelayList.length - 1"
+						/>
 					</div>
 					<br />
 					<button
@@ -55,7 +67,9 @@
 							id="teamOneResource"
 							placeholder="Team one resource, R1"
 							disabled
+							v-model="teamOneFinalResource"
 						/>
+						<a @click="updateTeamOneResource">U</a>
 					</div>
 				</div>
 			</div>
@@ -107,11 +121,16 @@
 </template>
 
 <script setup>
+import adjustedTable from "../utils/adjustedTable.json";
+import { isMidOver, getAdjustedTableType } from "../utils/utils";
+const G50 = 245;
+
 var teamOneDelay = ref(false);
 // var totalDelayTeamOne = ref(0);
 var teamOneDelayList = ref([]);
 var teamOneScore = ref(0);
-var teamOneStartOver = ref(0);
+var teamOneStartOver = ref(50);
+var teamOneFinalResource = ref(100);
 
 var teamTwoDelay = ref(false);
 // var totalDelayTeamTwo = ref(0);
@@ -122,12 +141,14 @@ var teamTwoStartOver = ref(0);
 const increaseDelay = (team) => {
 	if (team === 1) {
 		let delayObj = {
+			over: 0,
 			finalOverKey: 0,
 			wicketsFallKey: 0,
 		};
 		teamOneDelayList.value.push(delayObj);
 	} else if (team === 2) {
 		let delayObj = {
+			over: 0,
 			finalOverKey: 0,
 			wicketsFallKey: 0,
 		};
@@ -135,13 +156,77 @@ const increaseDelay = (team) => {
 	}
 };
 
+const updateTeamOneResource = () => {
+	if (teamOneDelay.value) {
+		var ln = teamOneDelayList.value.length;
+
+		var table =
+			adjustedTable[
+				getAdjustedTableType(
+					teamOneStartOver.value - teamOneDelayList.value[ln - 1].over
+				)
+			];
+		var percentageObj = table.find(
+			(el) =>
+				el.overs ===
+				teamOneStartOver.value - teamOneDelayList.value[ln - 1].over
+		);
+		var suspensionResource =
+			percentageObj[String(teamOneDelayList.value[ln - 1].wicketsFallKey)];
+		var table =
+			adjustedTable[
+				getAdjustedTableType(
+					teamOneDelayList.value[ln - 1].finalOverKey -
+						teamOneDelayList.value[ln - 1].over
+				)
+			];
+		var percentageObj = table.find(
+			(el) =>
+				el.overs ===
+				teamOneDelayList.value[ln - 1].finalOverKey -
+					teamOneDelayList.value[ln - 1].over
+		);
+		var resumptionResource =
+			percentageObj[teamOneDelayList.value[ln - 1].wicketsFallKey];
+
+		var diff = suspensionResource - resumptionResource;
+		teamOneFinalResource.value = teamOneFinalResource.value - diff;
+	}
+};
+
 watch(
 	() => teamOneDelay.value,
-	(newVal, oldVal) => {}
+	(newVal, oldVal) => {
+		if (newVal === false) {
+			teamOneDelayList.value = [];
+		}
+	}
 );
 watch(
 	() => teamTwoDelay.value,
-	(newVal, oldVal) => {}
+	(newVal, oldVal) => {
+		if (newVal === false) {
+			teamTwoDelayList.value = [];
+		}
+	}
+);
+
+watch(
+	() => teamOneDelayList.value,
+	(newVal, oldVal) => {},
+	{ deep: true }
+);
+
+watch(
+	() => teamOneStartOver.value,
+	(newVal, oldVal) => {
+		// Get ICC adjusted table data
+		var table = adjustedTable[getAdjustedTableType(teamOneStartOver.value)];
+		var percentageObj = table.find(
+			(el) => el.overs === Number(teamOneStartOver.value)
+		);
+		teamOneFinalResource.value = percentageObj["0"];
+	}
 );
 </script>
 
