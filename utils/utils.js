@@ -1,3 +1,16 @@
+export const overLeft = (targetOver, completeOver) => {
+	const [intPart, decimalPart] = completeOver.toString().split(".");
+	var decimalFraction = parseFloat(`0.${decimalPart}`);
+	if (decimalFraction !== -0) {
+		decimalFraction = 0.6 - decimalFraction;
+		const remainingOvers = targetOver - parseInt(intPart) - 1 + decimalFraction;
+		return remainingOvers;
+	} else {
+		const remainingOvers = targetOver - parseInt(intPart);
+		return remainingOvers;
+	}
+};
+
 export const isMidOver = (over) => {
 	if (over) {
 		return over - parseInt(over) != 0 ? true : false;
