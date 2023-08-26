@@ -1,0 +1,28 @@
+
+:root{
+	margin: 0;
+	padding: 0;
+	--primary-color: #000;
+	--pink-ball-color: #ff66cc;
+	--white-ball-color: #ffffff;
+	--red-ball-color: #8c182b;
+}
+
+body {
+	font-family: "Work Sans",monospace;
+}
+
+a{
+	text-decoration: none;
+}
+
+ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.py-50{
+	padding-top: 50px;
+	padding-bottom: 50px;
+}
