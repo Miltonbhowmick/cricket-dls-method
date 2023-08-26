@@ -49,6 +49,7 @@
 							type="number"
 							id="teamOneWickets"
 							placeholder="Team one wicket"
+							min="9"
 							v-model="teamOneDelayList[index].wicketsFallKey"
 							:disabled="item.appliedResource"
 						/>
@@ -123,6 +124,7 @@
 								type="number"
 								id="teamOneWickets"
 								placeholder="Team one wicket"
+								min="9"
 								v-model="teamTwoDelayList[index].wicketsFallKey"
 								:disabled="item.appliedResource"
 							/>
@@ -259,7 +261,7 @@ const updateTeamOneResource = () => {
 		);
 		var suspensionResource =
 			percentageObj[String(teamOneDelayList.value[ln - 1].wicketsFallKey)];
-
+		console.log(">>>>", percentageObj, suspensionResource);
 		// Team 1 resumption percentage
 		var resumptionResource = 0;
 		if (appropriateOver !== teamOneDelayList.value[ln - 1].finalOverKey) {
