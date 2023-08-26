@@ -34,20 +34,23 @@
 
 					<div v-for="(item, index) in teamOneDelayList" :key="index">
 						<input
+							type="number"
 							placeholder="Complete over"
 							v-model="teamOneDelayList[index].over"
-							:disabled="index !== teamOneDelayList.length - 1"
+							:disabled="item.appliedResource"
 						/>
 						<input
+							type="number"
 							placeholder="Cut and final over"
 							v-model="teamOneDelayList[index].finalOverKey"
-							:disabled="index !== teamOneDelayList.length - 1"
+							:disabled="item.appliedResource"
 						/>
 						<input
+							type="number"
 							id="teamOneWickets"
 							placeholder="Team one wicket"
 							v-model="teamOneDelayList[index].wicketsFallKey"
-							:disabled="index !== teamOneDelayList.length - 1"
+							:disabled="item.appliedResource"
 						/>
 					</div>
 					<br />
@@ -61,7 +64,7 @@
 						<label for="teamOneWickets">Team 1 wickets</label>
 						<input id="teamOneWickets" placeholder="Team one wicket" />
 					</div> -->
-					<div>
+					<div class="resource-box">
 						<label for="teamOneResource">Team 1 resource</label>
 						<input
 							id="teamOneResource"
@@ -69,7 +72,13 @@
 							disabled
 							v-model="teamOneFinalResource"
 						/>
-						<a @click="updateTeamOneResource">U</a>
+						<button
+							@click="updateTeamOneResource"
+							class="resource-update"
+							:class="{ active: isTeamOneUpdatedResource === true }"
+						>
+							U
+						</button>
 					</div>
 				</div>
 			</div>
@@ -99,20 +108,23 @@
 					<div class="content">
 						<div v-for="(item, index) in teamTwoDelayList" :key="index">
 							<input
+								type="number"
 								placeholder="Complete over"
 								v-model="teamTwoDelayList[index].over"
-								:disabled="index !== teamTwoDelayList.length - 1"
+								:disabled="item.appliedResource"
 							/>
 							<input
+								type="number"
 								placeholder="Cut and final over"
 								v-model="teamTwoDelayList[index].finalOverKey"
-								:disabled="index !== teamTwoDelayList.length - 1"
+								:disabled="item.appliedResource"
 							/>
 							<input
+								type="number"
 								id="teamOneWickets"
 								placeholder="Team one wicket"
 								v-model="teamTwoDelayList[index].wicketsFallKey"
-								:disabled="index !== teamTwoDelayList.length - 1"
+								:disabled="item.appliedResource"
 							/>
 						</div>
 						<br />
@@ -122,15 +134,21 @@
 						>
 							v
 						</button>
-						<div>
-							<label for="teamOneResource">Team 1 resource</label>
+						<div class="resource-box">
+							<label for="teamTwoResource">Team 2 resource</label>
 							<input
-								id="teamOneResource"
-								placeholder="Team one resource, R1"
+								id="teamTwoResource"
+								placeholder="Team Two resource, R1"
 								disabled
 								v-model="teamTwoFinalResource"
 							/>
-							<a @click="updateTeamTwoResource">U</a>
+							<button
+								@click="updateTeamTwoResource"
+								class="resource-update"
+								:class="{ active: isTeamTwoUpdatedResource === true }"
+							>
+								U
+							</button>
 						</div>
 					</div>
 				</div>
@@ -150,6 +168,7 @@ var teamOneDelayList = ref([]);
 var teamOneScore = ref(0);
 var teamOneStartOver = ref(50);
 var teamOneFinalResource = ref(100);
+var isTeamOneUpdatedResource = ref(false);
 
 var teamTwoDelay = ref(false);
 // var totalDelayTeamTwo = ref(0);
@@ -157,24 +176,23 @@ var teamTwoDelayList = ref([]);
 var teamTwoScore = ref(0);
 var teamTwoStartOver = ref(0);
 var teamTwoFinalResource = ref(100);
+var isTeamTwoUpdatedResource = ref(false);
 
 var revisedScore = ref(0);
 
 const increaseDelay = (team) => {
+	var delayObj = {
+		over: 0,
+		finalOverKey: 0,
+		wicketsFallKey: 0,
+		appliedResource: false,
+	};
 	if (team === 1) {
-		let delayObj = {
-			over: 0,
-			finalOverKey: 0,
-			wicketsFallKey: 0,
-		};
 		teamOneDelayList.value.push(delayObj);
+		isTeamOneUpdatedResource.value = true;
 	} else if (team === 2) {
-		let delayObj = {
-			over: 0,
-			finalOverKey: 0,
-			wicketsFallKey: 0,
-		};
 		teamTwoDelayList.value.push(delayObj);
+		isTeamTwoUpdatedResource.value = true;
 	}
 };
 
@@ -205,92 +223,145 @@ const updateTeamOneResource = () => {
 	if (teamOneDelay.value) {
 		var ln = teamOneDelayList.value.length;
 
+		if (
+			teamOneDelayList.value[ln - 1].over === 0 &&
+			teamOneDelayList.value[ln - 1].finalOverKey === 0 &&
+			teamOneDelayList.value[ln - 1].wicketsFallKey === 0
+		) {
+			console.log("TEAM 1: Please set delay inputs");
+			return;
+		}
+		if (
+			teamOneDelayList.value[ln - 1].over >=
+			teamOneDelayList.value[ln - 1].finalOverKey
+		) {
+			console.log(
+				"TEAM 1: complete over must be less than final over after disturbance(rain etc)"
+			);
+			return;
+		}
+
+		var appropriateOver = teamOneStartOver.value;
+		if (teamOneDelayList.value.length > 1) {
+			appropriateOver = teamOneDelayList.value[ln - 2].finalOverKey;
+		}
+		// Team 1 suspension percentage
 		var table =
 			adjustedTable[
 				getAdjustedTableType(
-					teamOneStartOver.value - teamOneDelayList.value[ln - 1].over
+					overLeft(appropriateOver, teamOneDelayList.value[ln - 1].over)
 				)
 			];
 		var percentageObj = table.find(
 			(el) =>
 				el.overs ===
-				overLeft(teamOneStartOver.value, teamOneDelayList.value[ln - 1].over)
+				overLeft(appropriateOver, teamOneDelayList.value[ln - 1].over)
 		);
 		var suspensionResource =
 			percentageObj[String(teamOneDelayList.value[ln - 1].wicketsFallKey)];
 
-		table =
-			adjustedTable[
-				getAdjustedTableType(
-					teamOneDelayList.value[ln - 1].finalOverKey -
+		// Team 1 resumption percentage
+		var resumptionResource = 0;
+		if (appropriateOver !== teamOneDelayList.value[ln - 1].finalOverKey) {
+			console.log("duklo kn");
+			table =
+				adjustedTable[
+					getAdjustedTableType(
+						overLeft(
+							teamOneDelayList.value[ln - 1].finalOverKey -
+								teamOneDelayList.value[ln - 1].over
+						)
+					)
+				];
+			percentageObj = table.find(
+				(el) =>
+					el.overs ===
+					overLeft(
+						teamOneDelayList.value[ln - 1].finalOverKey,
 						teamOneDelayList.value[ln - 1].over
-				)
-			];
-		percentageObj = table.find(
-			(el) =>
-				el.overs ===
-				overLeft(
-					teamOneDelayList.value[ln - 1].finalOverKey,
-					teamOneDelayList.value[ln - 1].over
-				)
-		);
-		var resumptionResource =
-			percentageObj[teamOneDelayList.value[ln - 1].wicketsFallKey];
-
-		var diff = suspensionResource - resumptionResource;
-		console.log(
-			"match start over equal,",
-			diff,
-			teamOneDelayList.value[ln - 1].finalOverKey,
-			teamOneStartOver.value,
-			teamOneDelayList.value[ln - 1].finalOverKey === teamOneStartOver.value,
-			teamOneDelayList.value[ln - 1].finalOverKey == teamOneStartOver.value
-		);
-		if (
-			Number(teamOneDelayList.value[ln - 1].finalOverKey) ===
-			Number(teamOneStartOver.value)
-		) {
-			console.log("match start over equal to final cut over delay");
-			diff = suspensionResource;
+					)
+			);
+			resumptionResource =
+				percentageObj[teamOneDelayList.value[ln - 1].wicketsFallKey];
 		}
+		var diff = suspensionResource - resumptionResource;
+
 		teamOneFinalResource.value = teamOneFinalResource.value - diff;
+		isTeamOneUpdatedResource.value = false;
+		teamOneDelayList.value[ln - 1].appliedResource = true;
 	}
 };
 const updateTeamTwoResource = () => {
 	if (teamTwoDelay.value) {
 		var ln = teamTwoDelayList.value.length;
 
+		if (
+			teamTwoDelayList.value[ln - 1].over === 0 &&
+			teamTwoDelayList.value[ln - 1].finalOverKey === 0 &&
+			teamTwoDelayList.value[ln - 1].wicketsFallKey === 0
+		) {
+			console.log("TEAM 2: Please set delay inputs");
+			return;
+		}
+		if (
+			teamTwoDelayList.value[ln - 1].over >=
+			teamTwoDelayList.value[ln - 1].finalOverKey
+		) {
+			console.log(
+				"TEAM 2: complete over must be less than final over after disturbance(rain etc)"
+			);
+			return;
+		}
+
+		var appropriateOver = teamTwoStartOver.value;
+		if (teamTwoDelayList.value.length > 1) {
+			appropriateOver = teamTwoDelayList.value[ln - 2].finalOverKey;
+		}
+		console.log("app over", appropriateOver);
+		// Team 2 suspension percentage
 		var table =
 			adjustedTable[
 				getAdjustedTableType(
-					teamTwoStartOver.value - teamTwoDelayList.value[ln - 1].over
+					overLeft(appropriateOver, teamTwoDelayList.value[ln - 1].over)
 				)
 			];
 		var percentageObj = table.find(
 			(el) =>
 				el.overs ===
-				teamTwoStartOver.value - teamTwoDelayList.value[ln - 1].over
+				overLeft(appropriateOver, teamTwoDelayList.value[ln - 1].over)
 		);
+
 		var suspensionResource =
 			percentageObj[String(teamTwoDelayList.value[ln - 1].wicketsFallKey)];
-		var table =
-			adjustedTable[
-				getAdjustedTableType(
-					teamTwoDelayList.value[ln - 1].finalOverKey -
-						teamTwoDelayList.value[ln - 1].over
-				)
-			];
-		var percentageObj = table.find(
-			(el) =>
-				el.overs ===
-				teamTwoDelayList.value[ln - 1].finalOverKey -
-					teamTwoDelayList.value[ln - 1].over
-		);
-		var resumptionResource =
-			percentageObj[teamTwoDelayList.value[ln - 1].wicketsFallKey];
+		// console.log("suspen", suspensionResource);
 
+		// Team 2 resumption percentage
+		var resumptionResource = 0;
+		if (appropriateOver !== teamTwoDelayList.value[ln - 1].finalOverKey) {
+			var table =
+				adjustedTable[
+					getAdjustedTableType(
+						overLeft(
+							teamTwoDelayList.value[ln - 1].finalOverKey,
+							teamTwoDelayList.value[ln - 1].over
+						)
+					)
+				];
+			var percentageObj = table.find(
+				(el) =>
+					el.overs ===
+					overLeft(
+						teamTwoDelayList.value[ln - 1].finalOverKey,
+						teamTwoDelayList.value[ln - 1].over
+					)
+			);
+			resumptionResource =
+				percentageObj[teamTwoDelayList.value[ln - 1].wicketsFallKey];
+		}
 		var diff = suspensionResource - resumptionResource;
 		teamTwoFinalResource.value = teamTwoFinalResource.value - diff;
+		isTeamTwoUpdatedResource.value = false;
+		teamTwoDelayList.value[ln - 1].appliedResource = true;
 
 		calculateRevisedScore();
 	}
@@ -301,6 +372,9 @@ watch(
 	(newVal, oldVal) => {
 		if (newVal === false) {
 			teamOneDelayList.value = [];
+			isTeamOneUpdatedResource.value = false;
+		} else {
+			isTeamOneUpdatedResource.value = true;
 		}
 	}
 );
@@ -309,6 +383,9 @@ watch(
 	(newVal, oldVal) => {
 		if (newVal === false) {
 			teamTwoDelayList.value = [];
+			isTeamTwoUpdatedResource.value = false;
+		} else {
+			isTeamTwoUpdatedResource.value = true;
 		}
 	}
 );
@@ -358,6 +435,24 @@ onMounted(() => {
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
+			}
+			.content {
+				.delayed-inputs {
+					background: #ddd;
+					color: #222;
+					&.active {
+						background: #222;
+						color: #fff;
+					}
+				}
+				.resource-box {
+					.resource-update {
+						&.active {
+							border-color: var(--pink-ball-color);
+							box-shadow: 0px 0px 8px var(--pink-ball-color);
+						}
+					}
+				}
 			}
 		}
 	}
