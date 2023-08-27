@@ -17,6 +17,7 @@
 					<div>
 						<label for="overs">Match start at overs</label>
 						<input
+							type="number"
 							id="overs"
 							placeholder="Match start overs"
 							v-model="teamOneStartOver"
