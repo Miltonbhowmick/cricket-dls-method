@@ -1,160 +1,97 @@
 <template>
 	<div class="main py-50">
-		<h1>Cricket DLS <abbr>(Duckworth Lewis Stern)</abbr> method</h1>
+		<h1 class="title">
+			Cricket DLS <abbr>(Duckworth Lewis Stern)</abbr> method
+		</h1>
+		<p class="developer-signature">
+			Design & Develop by
+			<a href="https://github.com/Miltonbhowmick" target="_blank"
+				>miltonbhowmick</a
+			>
+		</p>
 		<section class="section-cases">
 			<div class="match-type">
-				<input
-					id="fiftyOver"
-					type="radio"
-					:value="50"
-					v-model="matchType"
-				/><label for="fiftyOver">50 Over</label>
-				<input
-					id="twentyTwenty"
-					type="radio"
-					:value="20"
-					v-model="matchType"
-				/><label for="twentyTwenty">T20 </label>
-			</div>
-			<div class="team">
-				<div class="header">
-					<h6>team 1</h6>
-					<div>
-						<input
-							id="team1Delay"
-							type="checkbox"
-							value="0"
-							v-model="teamOneDelay"
-						/>
-						<label for="team1Delay">delay</label>
-					</div>
+				<div class="type-box">
+					<input
+						id="fiftyOver"
+						type="radio"
+						:value="50"
+						v-model="matchType"
+					/><label for="fiftyOver">50 Over</label>
 				</div>
-				<div class="content">
-					<div>
-						<label for="overs">Match start at overs</label>
-						<input
-							type="number"
-							id="overs"
-							placeholder="Match start overs"
-							v-model="teamOneStartOver"
-							:disabled="teamOneDelay"
-						/>
-						<div class="emoticons">
-							<span v-if="matchType === 0 && teamOneStartOver !== 50">
-								&#129300;
-							</span>
-							<span v-else-if="matchType === 0 && teamOneStartOver > 50">
-								&#128563;
-							</span>
-							<span v-else-if="matchType === 1 && teamOneStartOver !== 20">
-								&#129300;
-							</span>
-							<span v-else-if="matchType === 1 && teamOneStartOver > 20">
-								&#128563;
-							</span>
+				<div class="type-box">
+					<input
+						id="twentyTwenty"
+						type="radio"
+						:value="20"
+						v-model="matchType"
+					/><label for="twentyTwenty">T20 </label>
+				</div>
+			</div>
+			<div class="match">
+				<div class="team">
+					<div class="header">
+						<h6>team 1</h6>
+						<div>
+							<input
+								id="team1Delay"
+								type="checkbox"
+								value="0"
+								v-model="teamOneDelay"
+							/>
+							<label for="team1Delay">delay</label>
 						</div>
 					</div>
-					<div>
-						<label for="teamOneScore">Team 1 score</label>
-						<input
-							id="teamOneScore"
-							placeholder="Team one score"
-							v-model="teamOneScore"
-						/>
-					</div>
-
-					<div v-for="(item, index) in teamOneDelayList" :key="index">
-						<input
-							type="number"
-							placeholder="Complete over"
-							v-model="teamOneDelayList[index].over"
-							:disabled="item.appliedResource"
-						/>
-						<input
-							type="number"
-							placeholder="Cut and final over"
-							v-model="teamOneDelayList[index].finalOverKey"
-							:disabled="item.appliedResource"
-						/>
-						<input
-							type="number"
-							id="teamOneWickets"
-							placeholder="Team one wicket"
-							min="9"
-							v-model="teamOneDelayList[index].wicketsFallKey"
-							:disabled="item.appliedResource"
-						/>
-					</div>
-					<br />
-					<button
-						v-if="teamOneDelay === true"
-						@click="increaseDelay((team = 1))"
-					>
-						v
-					</button>
-					<!-- <div>
-						<label for="teamOneWickets">Team 1 wickets</label>
-						<input id="teamOneWickets" placeholder="Team one wicket" />
-					</div> -->
-					<div class="resource-box">
-						<label for="teamOneResource">Team 1 resource</label>
-						<input
-							id="teamOneResource"
-							placeholder="Team one resource, R1"
-							disabled
-							v-model="teamOneFinalResource"
-						/>
-						<button
-							@click="updateTeamOneResource"
-							class="resource-update"
-							:class="{ active: isTeamOneUpdatedResource === true }"
-						>
-							U
-						</button>
-					</div>
-				</div>
-			</div>
-			<div class="team">
-				<div class="header">
-					<h6>
-						team 2
-						<strong v-if="revisedScore"
-							>Revised Score: {{ revisedScore }}</strong
-						>
-						<button @click="calculateRevisedScore">R</button>
-					</h6>
-					<div>
-						<input
-							id="team2Delay"
-							type="checkbox"
-							value="1"
-							v-model="teamTwoDelay"
-						/>
-						<label for="team2Delay">delay</label>
-					</div>
-				</div>
-				<div class="content">
-					<div>
-						<label for="overs">Match start at overs</label>
-						<input
-							type="number"
-							id="overs"
-							placeholder="Match start overs"
-							v-model="teamTwoStartOver"
-						/>
-					</div>
 					<div class="content">
-						<div v-for="(item, index) in teamTwoDelayList" :key="index">
+						<div>
+							<label for="overs">Match start at overs</label>
+							<input
+								type="number"
+								id="overs"
+								placeholder="Match start overs"
+								v-model="teamOneStartOver"
+								:disabled="teamOneDelay"
+							/>
+							<div class="emoticons">
+								<span v-if="matchType === 0 && teamOneStartOver !== 50">
+									&#129300;
+								</span>
+								<span v-else-if="matchType === 0 && teamOneStartOver > 50">
+									&#128563;
+								</span>
+								<span v-else-if="matchType === 1 && teamOneStartOver !== 20">
+									&#129300;
+								</span>
+								<span v-else-if="matchType === 1 && teamOneStartOver > 20">
+									&#128563;
+								</span>
+							</div>
+						</div>
+						<div>
+							<label for="teamOneScore">Team 1 score</label>
+							<input
+								type="number"
+								id="teamOneScore"
+								placeholder="Team one score"
+								v-model="teamOneScore"
+							/>
+						</div>
+
+						<div
+							v-for="(item, index) in teamOneDelayList"
+							:key="index"
+							class="delayed-inputs"
+						>
 							<input
 								type="number"
 								placeholder="Complete over"
-								v-model="teamTwoDelayList[index].over"
+								v-model="teamOneDelayList[index].over"
 								:disabled="item.appliedResource"
 							/>
 							<input
 								type="number"
 								placeholder="Cut and final over"
-								v-model="teamTwoDelayList[index].finalOverKey"
+								v-model="teamOneDelayList[index].finalOverKey"
 								:disabled="item.appliedResource"
 							/>
 							<input
@@ -162,41 +99,121 @@
 								id="teamOneWickets"
 								placeholder="Team one wicket"
 								min="9"
-								v-model="teamTwoDelayList[index].wicketsFallKey"
+								v-model="teamOneDelayList[index].wicketsFallKey"
 								:disabled="item.appliedResource"
 							/>
 						</div>
 						<br />
 						<button
-							v-if="teamTwoDelay === true"
-							@click="increaseDelay((team = 2))"
+							v-if="teamOneDelay === true"
+							@click="increaseDelay((team = 1))"
 						>
 							v
 						</button>
+						<!-- <div>
+							<label for="teamOneWickets">Team 1 wickets</label>
+							<input id="teamOneWickets" placeholder="Team one wicket" />
+						</div> -->
 						<div class="resource-box">
-							<label for="teamTwoResource">Team 2 resource</label>
+							<label for="teamOneResource">Team 1 resource</label>
 							<input
-								id="teamTwoResource"
-								placeholder="Team Two resource, R1"
+								id="teamOneResource"
+								placeholder="Team one resource, R1"
 								disabled
-								v-model="teamTwoFinalResource"
+								v-model="teamOneFinalResource"
 							/>
 							<button
-								@click="updateTeamTwoResource"
+								@click="updateTeamOneResource"
 								class="resource-update"
-								:class="{ active: isTeamTwoUpdatedResource === true }"
+								:class="{ active: isTeamOneUpdatedResource === true }"
 							>
 								U
 							</button>
 						</div>
 					</div>
 				</div>
-			</div>
-			<div class="my-20">
-				Design & Develop by
-				<a href="https://github.com/Miltonbhowmick" target="_blank"
-					>miltonbhowmick</a
-				>
+				<div class="team">
+					<div class="header">
+						<h6>
+							team 2
+							<strong v-if="revisedScore"
+								>Revised Score: {{ revisedScore }}</strong
+							>
+							<button @click="calculateRevisedScore">R</button>
+						</h6>
+						<div>
+							<input
+								id="team2Delay"
+								type="checkbox"
+								value="1"
+								v-model="teamTwoDelay"
+							/>
+							<label for="team2Delay">delay</label>
+						</div>
+					</div>
+					<div class="content">
+						<div>
+							<label for="overs">Match start at overs</label>
+							<input
+								type="number"
+								id="overs"
+								placeholder="Match start overs"
+								v-model="teamTwoStartOver"
+							/>
+						</div>
+						<div class="content">
+							<div
+								v-for="(item, index) in teamTwoDelayList"
+								:key="index"
+								class="delayed-inputs"
+							>
+								<input
+									type="number"
+									placeholder="Complete over"
+									v-model="teamTwoDelayList[index].over"
+									:disabled="item.appliedResource"
+								/>
+								<input
+									type="number"
+									placeholder="Cut and final over"
+									v-model="teamTwoDelayList[index].finalOverKey"
+									:disabled="item.appliedResource"
+								/>
+								<input
+									type="number"
+									id="teamOneWickets"
+									placeholder="Team one wicket"
+									min="9"
+									v-model="teamTwoDelayList[index].wicketsFallKey"
+									:disabled="item.appliedResource"
+								/>
+							</div>
+							<br />
+							<button
+								v-if="teamTwoDelay === true"
+								@click="increaseDelay((team = 2))"
+							>
+								v
+							</button>
+							<div class="resource-box">
+								<label for="teamTwoResource">Team 2 resource</label>
+								<input
+									id="teamTwoResource"
+									placeholder="Team Two resource, R1"
+									disabled
+									v-model="teamTwoFinalResource"
+								/>
+								<button
+									@click="updateTeamTwoResource"
+									class="resource-update"
+									:class="{ active: isTeamTwoUpdatedResource === true }"
+								>
+									U
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</section>
 	</div>
@@ -313,8 +330,8 @@ const updateTeamOneResource = () => {
 				adjustedTable[
 					getAdjustedTableType(
 						overLeft(
-							teamOneDelayList.value[ln - 1].finalOverKey -
-								teamOneDelayList.value[ln - 1].over
+							teamOneDelayList.value[ln - 1].finalOverKey,
+							teamOneDelayList.value[ln - 1].over
 						)
 					)
 				];
@@ -479,27 +496,48 @@ onMounted(() => {
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
+	.title {
+		margin: 0;
+	}
+	.developer-signature {
+	}
 	.section-cases {
-		.team {
-			.header {
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-			}
-			.content {
-				.delayed-inputs {
-					background: #ddd;
-					color: #222;
-					&.active {
-						background: #222;
-						color: #fff;
-					}
+		width: 50%;
+		.match-type {
+			display: flex;
+			justify-content: center;
+			gap: 15px;
+		}
+		.match {
+			display: flex;
+			justify-content: center;
+			gap: 40px;
+			.team {
+				.header {
+					display: flex;
+					justify-content: flex-start;
+					align-items: center;
 				}
-				.resource-box {
-					.resource-update {
+				.content {
+					display: flex;
+					flex-direction: column;
+					gap: 10px;
+					.delayed-inputs {
+						input {
+							width: 55px;
+							text-align: center;
+						}
 						&.active {
-							border-color: var(--pink-ball-color);
-							box-shadow: 0px 0px 8px var(--pink-ball-color);
+							background: #222;
+							color: #fff;
+						}
+					}
+					.resource-box {
+						.resource-update {
+							&.active {
+								border-color: var(--pink-ball-color);
+								box-shadow: 0px 0px 8px var(--pink-ball-color);
+							}
 						}
 					}
 				}
