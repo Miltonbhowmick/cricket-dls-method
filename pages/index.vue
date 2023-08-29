@@ -2,374 +2,471 @@
 	<div class="main py-50">
 		<h1>Cricket DLS <abbr>(Duckworth Lewis Stern)</abbr> method</h1>
 		<section class="section-cases">
-			<div class="cases">
-				<div class="case-types">
-					<h1>DLS Methods types</h1>
-					<ul>
-						<li
-							v-for="(item, index) in caseTypes"
-							:key="index"
-							:class="{ active: activeCaseType === item.type }"
-							@click="handleMethodType(item.type)"
+			<div class="match-type">
+				<input
+					id="fiftyOver"
+					type="radio"
+					:value="50"
+					v-model="matchType"
+				/><label for="fiftyOver">50 Over</label>
+				<input
+					id="twentyTwenty"
+					type="radio"
+					:value="20"
+					v-model="matchType"
+				/><label for="twentyTwenty">T20 </label>
+			</div>
+			<div class="team">
+				<div class="header">
+					<h6>team 1</h6>
+					<div>
+						<input
+							id="team1Delay"
+							type="checkbox"
+							value="0"
+							v-model="teamOneDelay"
+						/>
+						<label for="team1Delay">delay</label>
+					</div>
+				</div>
+				<div class="content">
+					<div>
+						<label for="overs">Match start at overs</label>
+						<input
+							type="number"
+							id="overs"
+							placeholder="Match start overs"
+							v-model="teamOneStartOver"
+							:disabled="teamOneDelay"
+						/>
+						<div class="emoticons">
+							<span v-if="matchType === 0 && teamOneStartOver !== 50">
+								&#129300;
+							</span>
+							<span v-else-if="matchType === 0 && teamOneStartOver > 50">
+								&#128563;
+							</span>
+							<span v-else-if="matchType === 1 && teamOneStartOver !== 20">
+								&#129300;
+							</span>
+							<span v-else-if="matchType === 1 && teamOneStartOver > 20">
+								&#128563;
+							</span>
+						</div>
+					</div>
+					<div>
+						<label for="teamOneScore">Team 1 score</label>
+						<input
+							id="teamOneScore"
+							placeholder="Team one score"
+							v-model="teamOneScore"
+						/>
+					</div>
+
+					<div v-for="(item, index) in teamOneDelayList" :key="index">
+						<input
+							type="number"
+							placeholder="Complete over"
+							v-model="teamOneDelayList[index].over"
+							:disabled="item.appliedResource"
+						/>
+						<input
+							type="number"
+							placeholder="Cut and final over"
+							v-model="teamOneDelayList[index].finalOverKey"
+							:disabled="item.appliedResource"
+						/>
+						<input
+							type="number"
+							id="teamOneWickets"
+							placeholder="Team one wicket"
+							min="9"
+							v-model="teamOneDelayList[index].wicketsFallKey"
+							:disabled="item.appliedResource"
+						/>
+					</div>
+					<br />
+					<button
+						v-if="teamOneDelay === true"
+						@click="increaseDelay((team = 1))"
+					>
+						v
+					</button>
+					<!-- <div>
+						<label for="teamOneWickets">Team 1 wickets</label>
+						<input id="teamOneWickets" placeholder="Team one wicket" />
+					</div> -->
+					<div class="resource-box">
+						<label for="teamOneResource">Team 1 resource</label>
+						<input
+							id="teamOneResource"
+							placeholder="Team one resource, R1"
+							disabled
+							v-model="teamOneFinalResource"
+						/>
+						<button
+							@click="updateTeamOneResource"
+							class="resource-update"
+							:class="{ active: isTeamOneUpdatedResource === true }"
 						>
-							<span>{{ item.title }}</span>
-						</li>
-					</ul>
-				</div>
-				<div v-if="activeCaseType === 0" class="box">
-					<h2>Rain during Team 1</h2>
-					<h3>overs: {{ caseData.numberOfOvers }}</h3>
-					<div class="inputs">
-						<div>
-							<label>team1 score</label>
-							<input v-model="caseData.teamOneScore" type="number" min="0" />
-							<span> &#128551;</span>
-						</div>
-						<div>
-							<label>team1 overs complete</label>
-							<input
-								v-model="caseData.teamOneOverComplete"
-								type="number"
-								step=".01"
-								min="0"
-							/>
-							<span
-								v-if="caseData.teamOneOverComplete > caseData.numberOfOvers"
-							>
-								&#128564;</span
-							>
-						</div>
-						<div>
-							<label>team1 overs left</label>
-							<input
-								disabled
-								v-model="caseData.teamOneOverLeft"
-								type="number"
-								min="0"
-							/>
-						</div>
-						<div>
-							<label>team1 fall of wickets</label>
-							<input
-								v-model="caseData.teamOneWicketFall"
-								type="number"
-								min="0"
-								max="10"
-							/>
-							<span v-if="caseData.teamOneWicketFall > 10">&#128564;</span>
-						</div>
-						<div>
-							<label>team1 resource available</label>
-							<input
-								disabled
-								v-model="caseData.teamOneResource"
-								type="number"
-								min="0"
-							/>
-						</div>
-						<div>
-							<label>Cut and final over</label>
-							<input v-model="caseData.cutFinalOver" type="number" min="0" />
-						</div>
-						<div>
-							<label>team2 resource available</label>
-							<input
-								disabled
-								v-model="caseData.teamTwoResource"
-								type="number"
-								min="0"
-							/>
-						</div>
-						<div>
-							<label>team2 wicket fall</label>
-							<input
-								disabled
-								v-model="caseData.teamTwoWicketFall"
-								type="number"
-								min="0"
-							/>
-						</div>
-						<div>
-							<label>team2 wicket available: </label>
-							<span>{{ 10 - caseData.teamTwoWicketFall }}</span>
-						</div>
-						<hr />
+							U
+						</button>
 					</div>
-					<div class="answers" v-if="answers">{{ answers }}</div>
-					<button @click="calculationDLS(0)">submit</button>
 				</div>
-				<div v-else-if="activeCaseType === 1" class="box">
-					<h2>delay to start of Team 2’s innings</h2>
-					<h3>overs: {{ caseData.numberOfOvers }}</h3>
-					<div class="inputs">
-						<div>
-							<label>team1 overs start at match</label>
-							<input v-model="caseData.numberOfOvers" type="number" min="0" />
-							<span> &#128551;</span>
-						</div>
-						<div>
-							<label>team1 score</label>
-							<input v-model="caseData.teamOneScore" type="number" min="0" />
-							<span> &#128551;</span>
-						</div>
-						<div>
-							<label>team1 overs complete</label>
-							<input
-								v-model="caseData.teamOneOverComplete"
-								type="number"
-								step=".01"
-								min="0"
-							/>
-							<span
-								v-if="caseData.teamOneOverComplete > caseData.numberOfOvers"
-							>
-								&#128564;</span
-							>
-						</div>
-						<div>
-							<label>team1 overs left</label>
-							<input
-								disabled
-								v-model="caseData.teamOneOverLeft"
-								type="number"
-								min="0"
-							/>
-						</div>
-						<div>
-							<label>team1 fall of wickets</label>
-							<input
-								v-model="caseData.teamOneWicketFall"
-								type="number"
-								min="0"
-								max="10"
-							/>
-							<span v-if="caseData.teamOneWicketFall > 10">&#128564;</span>
-						</div>
-						<div>
-							<label>team1 resource available</label>
-							<input
-								disabled
-								v-model="caseData.teamOneResource"
-								type="number"
-								min="0"
-							/>
-						</div>
-						<div>
-							<label>Cut and final over</label>
-							<input v-model="caseData.cutFinalOver" type="number" min="0" />
-						</div>
-						<div>
-							<label>team2 resource available</label>
-							<input
-								disabled
-								v-model="caseData.teamTwoResource"
-								type="number"
-								min="0"
-							/>
-						</div>
-						<div>
-							<label>team2 wicket fall</label>
-							<input
-								disabled
-								v-model="caseData.teamTwoWicketFall"
-								type="number"
-								min="0"
-							/>
-						</div>
-						<div>
-							<label>team2 wicket available: </label>
-							<span>{{ 10 - caseData.teamTwoWicketFall }}</span>
-						</div>
-						<hr />
+			</div>
+			<div class="team">
+				<div class="header">
+					<h6>
+						team 2
+						<strong v-if="revisedScore"
+							>Revised Score: {{ revisedScore }}</strong
+						>
+						<button @click="calculateRevisedScore">R</button>
+					</h6>
+					<div>
+						<input
+							id="team2Delay"
+							type="checkbox"
+							value="1"
+							v-model="teamTwoDelay"
+						/>
+						<label for="team2Delay">delay</label>
 					</div>
-					<div class="answers" v-if="answers">{{ answers }}</div>
-					<button @click="calculationDLS(1)">submit</button>
+				</div>
+				<div class="content">
+					<div>
+						<label for="overs">Match start at overs</label>
+						<input
+							type="number"
+							id="overs"
+							placeholder="Match start overs"
+							v-model="teamTwoStartOver"
+						/>
+					</div>
+					<div class="content">
+						<div v-for="(item, index) in teamTwoDelayList" :key="index">
+							<input
+								type="number"
+								placeholder="Complete over"
+								v-model="teamTwoDelayList[index].over"
+								:disabled="item.appliedResource"
+							/>
+							<input
+								type="number"
+								placeholder="Cut and final over"
+								v-model="teamTwoDelayList[index].finalOverKey"
+								:disabled="item.appliedResource"
+							/>
+							<input
+								type="number"
+								id="teamOneWickets"
+								placeholder="Team one wicket"
+								min="9"
+								v-model="teamTwoDelayList[index].wicketsFallKey"
+								:disabled="item.appliedResource"
+							/>
+						</div>
+						<br />
+						<button
+							v-if="teamTwoDelay === true"
+							@click="increaseDelay((team = 2))"
+						>
+							v
+						</button>
+						<div class="resource-box">
+							<label for="teamTwoResource">Team 2 resource</label>
+							<input
+								id="teamTwoResource"
+								placeholder="Team Two resource, R1"
+								disabled
+								v-model="teamTwoFinalResource"
+							/>
+							<button
+								@click="updateTeamTwoResource"
+								class="resource-update"
+								:class="{ active: isTeamTwoUpdatedResource === true }"
+							>
+								U
+							</button>
+						</div>
+					</div>
 				</div>
 			</div>
 		</section>
 	</div>
 </template>
+
 <script setup>
 import adjustedTable from "../utils/adjustedTable.json";
+import { overLeft, isMidOver, getAdjustedTableType } from "../utils/utils";
 const G50 = 245;
 
-var caseTypes = ref([
-	{
-		title: "Suspension during Team 1’s innings",
-		type: 0,
-	},
-	{
-		title: "delay to start of Team 2’s innings",
-		type: 1,
-	},
-]);
-var activeCaseType = ref(caseTypes.value[0].type);
+var matchType = ref(50);
 
-var caseData = reactive({
-	numberOfOvers: 50,
-	startResource: 100,
-	teamOneScore: 0,
-	teamOneOverComplete: 0,
-	teamOneOverLeft: 0,
-	teamOneWicketFall: 0,
-	teamOneSuspensionResource: 0,
-	teamOneResumptionResource: 0,
-	teamOneLostResource: 0,
-	teamOneResource: 0,
-	teamTwoResource: 0,
-	cutFinalOver: 0,
-	teamTwoResource: 0,
-	teamTwoWicketFall: 0,
-});
-var answers = reactive({});
+var teamOneDelay = ref(false);
+// var totalDelayTeamOne = ref(0);
+var teamOneDelayList = ref([]);
+var teamOneScore = ref(0);
+var teamOneStartOver = ref(50);
+var teamOneFinalResource = ref(100);
+var isTeamOneUpdatedResource = ref(false);
 
-const resetCaseData = () => {
-	caseData.numberOfOvers = 50;
-	caseData.startResource = 100;
-	caseData.teamOneScore = 0;
-	caseData.teamOneOverComplete = 0;
-	caseData.teamOneOverLeft = 0;
-	caseData.teamOneWicketFall = 0;
-	caseData.teamOneSuspensionResource = 0;
-	caseData.teamOneResumptionResource = 0;
-	caseData.teamOneLostResource = 0;
-	caseData.teamOneResource = 0;
-	caseData.teamTwoResource = 0;
-	caseData.cutFinalOver = 0;
-	caseData.teamTwoResource = 0;
-	caseData.teamTwoWicketFall = 0;
+var teamTwoDelay = ref(false);
+// var totalDelayTeamTwo = ref(0);
+var teamTwoDelayList = ref([]);
+var teamTwoScore = ref(0);
+var teamTwoStartOver = ref(0);
+var teamTwoFinalResource = ref(100);
+var isTeamTwoUpdatedResource = ref(false);
+
+var revisedScore = ref(0);
+
+const increaseDelay = (team) => {
+	var delayObj = {
+		over: 0,
+		finalOverKey: 0,
+		wicketsFallKey: 0,
+		appliedResource: false,
+	};
+	if (team === 1) {
+		teamOneDelayList.value.push(delayObj);
+		isTeamOneUpdatedResource.value = true;
+	} else if (team === 2) {
+		teamTwoDelayList.value.push(delayObj);
+		isTeamTwoUpdatedResource.value = true;
+	}
 };
 
-const calculationDLS = (type) => {
-	if (type === 0) {
-		// Formula:
-		// Revised Score = S + G50 x (R2/R1) + 1
-		// Where, S is team one score
-		// R1 resource of team 1, R2 resource of team 2
-		// G50 is a standard score (245 total run) for a international criecket team
-		var difference =
-			(Number(caseData.teamTwoResource) - Number(caseData.teamOneResource)) /
-			100;
-		var revisedScore = caseData.teamOneScore + G50 * difference + 1;
-		answers["revised_score"] = revisedScore;
-	} else if (type === 1) {
-		// Formula:
-		// Revised Score = S x (R2/R1) + 1
-		// Where, S is team one score,
-		// R1 resource of team 1, R2 resource of team 2
+const calculateRevisedScore = () => {
+	// If R2 is less than R1
+	if (teamTwoFinalResource.value < teamOneFinalResource.value) {
 		var division =
-			Number(caseData.teamTwoResource) / Number(caseData.teamOneResource);
-		var revisedScore = caseData.teamOneScore * division + 1;
-		answers["revised_score"] = revisedScore;
+			Number(teamTwoFinalResource.value) / Number(teamOneFinalResource.value);
+		var T = Number(teamOneScore.value) * division + 1;
+		revisedScore.value = T;
+	}
+	// If R2 is equal to R1,  no revision is needed
+	if (teamTwoFinalResource.value === teamOneFinalResource.value) {
+		var T = Number(teamOneScore.value) + 1;
+		revisedScore.value = T;
+	}
+	// If R2 is greater than R1
+	if (teamTwoFinalResource.value > teamOneFinalResource.value) {
+		var diff =
+			Number(teamTwoFinalResource.value) - Number(teamOneFinalResource.value);
+		var modDiff = (G50 * diff) / 100;
+		var T = Number(teamOneScore.value) + modDiff + 1;
+		revisedScore.value = T;
+	}
+};
+
+const updateTeamOneResource = () => {
+	if (teamOneDelay.value) {
+		var ln = teamOneDelayList.value.length;
+
+		if (
+			teamOneDelayList.value[ln - 1].over === 0 &&
+			teamOneDelayList.value[ln - 1].finalOverKey === 0 &&
+			teamOneDelayList.value[ln - 1].wicketsFallKey === 0
+		) {
+			console.log("TEAM 1: Please set delay inputs");
+			return;
+		}
+		if (
+			teamOneDelayList.value[ln - 1].over >=
+			teamOneDelayList.value[ln - 1].finalOverKey
+		) {
+			console.log(
+				"TEAM 1: complete over must be less than final over after disturbance(rain etc)"
+			);
+			return;
+		}
+
+		var appropriateOver = teamOneStartOver.value;
+		if (teamOneDelayList.value.length > 1) {
+			appropriateOver = teamOneDelayList.value[ln - 2].finalOverKey;
+		}
+		// Team 1 suspension percentage
+		var table =
+			adjustedTable[
+				getAdjustedTableType(
+					overLeft(appropriateOver, teamOneDelayList.value[ln - 1].over)
+				)
+			];
+		var percentageObj = table.find(
+			(el) =>
+				el.overs ===
+				overLeft(appropriateOver, teamOneDelayList.value[ln - 1].over)
+		);
+		var suspensionResource =
+			percentageObj[String(teamOneDelayList.value[ln - 1].wicketsFallKey)];
+		// Team 1 resumption percentage
+		var resumptionResource = 0;
+		if (appropriateOver !== teamOneDelayList.value[ln - 1].finalOverKey) {
+			table =
+				adjustedTable[
+					getAdjustedTableType(
+						overLeft(
+							teamOneDelayList.value[ln - 1].finalOverKey -
+								teamOneDelayList.value[ln - 1].over
+						)
+					)
+				];
+			percentageObj = table.find(
+				(el) =>
+					el.overs ===
+					overLeft(
+						teamOneDelayList.value[ln - 1].finalOverKey,
+						teamOneDelayList.value[ln - 1].over
+					)
+			);
+			resumptionResource =
+				percentageObj[teamOneDelayList.value[ln - 1].wicketsFallKey];
+		}
+		var diff = suspensionResource - resumptionResource;
+
+		teamOneFinalResource.value = teamOneFinalResource.value - diff;
+		isTeamOneUpdatedResource.value = false;
+		teamOneDelayList.value[ln - 1].appliedResource = true;
+	}
+};
+const updateTeamTwoResource = () => {
+	if (teamTwoDelay.value) {
+		var ln = teamTwoDelayList.value.length;
+
+		if (
+			teamTwoDelayList.value[ln - 1].over === 0 &&
+			teamTwoDelayList.value[ln - 1].finalOverKey === 0 &&
+			teamTwoDelayList.value[ln - 1].wicketsFallKey === 0
+		) {
+			console.log("TEAM 2: Please set delay inputs");
+			return;
+		}
+		if (
+			teamTwoDelayList.value[ln - 1].over >=
+			teamTwoDelayList.value[ln - 1].finalOverKey
+		) {
+			console.log(
+				"TEAM 2: complete over must be less than final over after disturbance(rain etc)"
+			);
+			return;
+		}
+
+		var appropriateOver = teamTwoStartOver.value;
+		if (teamTwoDelayList.value.length > 1) {
+			appropriateOver = teamTwoDelayList.value[ln - 2].finalOverKey;
+		}
+		// Team 2 suspension percentage
+		var table =
+			adjustedTable[
+				getAdjustedTableType(
+					overLeft(appropriateOver, teamTwoDelayList.value[ln - 1].over)
+				)
+			];
+		var percentageObj = table.find(
+			(el) =>
+				el.overs ===
+				overLeft(appropriateOver, teamTwoDelayList.value[ln - 1].over)
+		);
+
+		var suspensionResource =
+			percentageObj[String(teamTwoDelayList.value[ln - 1].wicketsFallKey)];
+
+		// Team 2 resumption percentage
+		var resumptionResource = 0;
+		if (appropriateOver !== teamTwoDelayList.value[ln - 1].finalOverKey) {
+			table =
+				adjustedTable[
+					getAdjustedTableType(
+						overLeft(
+							teamTwoDelayList.value[ln - 1].finalOverKey,
+							teamTwoDelayList.value[ln - 1].over
+						)
+					)
+				];
+			percentageObj = table.find(
+				(el) =>
+					el.overs ===
+					overLeft(
+						teamTwoDelayList.value[ln - 1].finalOverKey,
+						teamTwoDelayList.value[ln - 1].over
+					)
+			);
+			resumptionResource =
+				percentageObj[teamTwoDelayList.value[ln - 1].wicketsFallKey];
+		}
+		var diff = suspensionResource - resumptionResource;
+
+		teamTwoFinalResource.value = teamTwoFinalResource.value - diff;
+		isTeamTwoUpdatedResource.value = false;
+		teamTwoDelayList.value[ln - 1].appliedResource = true;
+
+		calculateRevisedScore();
 	}
 };
 
 watch(
-	() => caseData.teamOneOverComplete,
+	() => teamOneDelay.value,
 	(newVal, oldVal) => {
-		console.log("=====", newVal);
-		if (newVal && newVal >= 0) {
-			if (caseData.teamOneOverComplete > caseData.numberOfOvers) return;
-			if (isMidOver(caseData.teamOneOverComplete)) {
-				// Calculating left over if complete over is in mid over
-				// if complete over 46.3
-				// then left over 3.3
-				let decimal =
-					caseData.teamOneOverComplete - parseInt(caseData.teamOneOverComplete);
-				let leftDecimal = 0.6 - decimal;
-				caseData.teamOneOverLeft =
-					caseData.numberOfOvers -
-					parseInt(caseData.teamOneOverComplete) -
-					1 +
-					parseFloat(leftDecimal.toFixed(1));
-			} else {
-				caseData.teamOneOverLeft =
-					caseData.numberOfOvers - caseData.teamOneOverComplete;
-			}
-
-			// Get ICC adjusted table data
-			var table = adjustedTable[getAdjustedTableType(caseData.teamOneOverLeft)];
-			var percentageObj = table.find(
-				(el) => el.overs === caseData.teamOneOverLeft
-			);
-			// Suspension resource after distrubing moment
-			caseData.teamOneSuspensionResource =
-				percentageObj[String(caseData.teamOneWicketFall)];
+		if (newVal === false) {
+			teamOneDelayList.value = [];
+			isTeamOneUpdatedResource.value = false;
+		} else {
+			isTeamOneUpdatedResource.value = true;
+		}
+	}
+);
+watch(
+	() => teamTwoDelay.value,
+	(newVal, oldVal) => {
+		if (newVal === false) {
+			teamTwoDelayList.value = [];
+			isTeamTwoUpdatedResource.value = false;
+		} else {
+			isTeamTwoUpdatedResource.value = true;
 		}
 	}
 );
 
 watch(
-	() => caseData.cutFinalOver,
-	(newVal, oldVal) => {
-		console.log("+++++DSD", newVal, oldVal);
-		if (newVal && newVal >= 0) {
-			// Get ICC adjusted table
-			var bigTable = adjustedTable["fiftyToZero"];
-			// Get team 2 resource, R2
-			var percentageObj = bigTable.find(
-				(el) => el.overs === caseData.cutFinalOver
-			);
-			caseData.teamTwoResource = percentageObj["0"];
-			// Get team 1 resumption resource
-			const difference = caseData.cutFinalOver - caseData.teamOneOverComplete;
-			var obj = bigTable.find((el) => el.overs === difference);
-			console.log("..,a.s,das", obj);
-			caseData.teamOneResumptionResource = obj[caseData.teamOneWicketFall];
-
-			caseData.teamOneLostResource =
-				caseData.teamOneSuspensionResource - caseData.teamOneResumptionResource;
-
-			caseData.teamOneResource =
-				caseData.startResource - caseData.teamOneLostResource;
-		}
-	}
+	() => teamOneDelayList.value,
+	(newVal, oldVal) => {},
+	{ deep: true }
 );
 
 watch(
-	() => caseData.teamOneWicketFall,
+	() => teamOneStartOver.value,
 	(newVal, oldVal) => {
-		if (newVal) {
-			console.log(">>>>>", newVal);
-			// Get ICC adjusted table data
-			var table = adjustedTable[getAdjustedTableType(caseData.teamOneOverLeft)];
-			var percentageObj = table.find(
-				(el) => el.overs === caseData.teamOneOverLeft
-			);
-			// Suspension resource after distrubing moment
-			caseData.teamOneSuspensionResource =
-				percentageObj[String(caseData.teamOneWicketFall)];
-
-			if (caseData.cutFinalOver) {
-				// Get team 1 resumption resource
-				var bigTable = adjustedTable["fiftyToZero"];
-				var obj = bigTable.find(
-					(el) =>
-						el.overs ===
-						String(caseData.cutFinalOver - caseData.teamOneOverComplete)
-				);
-				caseData.teamOneResumptionResource =
-					obj[String(caseData.teamOneWicketFall)];
-			}
-
-			caseData.teamOneLostResource =
-				caseData.teamOneSuspensionResource - caseData.teamOneResumptionResource;
-
-			caseData.teamOneResource =
-				caseData.startResource - caseData.teamOneLostResource;
-		}
+		// Get ICC adjusted table data
+		var table = adjustedTable[getAdjustedTableType(teamOneStartOver.value)];
+		var percentageObj = table.find(
+			(el) => el.overs === Number(teamOneStartOver.value)
+		);
+		teamOneFinalResource.value = percentageObj["0"];
 	}
 );
-
-const handleMethodType = (type) => {
-	activeCaseType.value = type;
-	resetCaseData();
-};
+watch(
+	() => teamTwoStartOver.value,
+	(newVal, oldVal) => {
+		// Get ICC adjusted table data
+		var table = adjustedTable[getAdjustedTableType(teamTwoStartOver.value)];
+		var percentageObj = table.find(
+			(el) => el.overs === Number(teamTwoStartOver.value)
+		);
+		teamTwoFinalResource.value = percentageObj["0"];
+	}
+);
+watch(
+	() => matchType.value,
+	(newVal, oldVal) => {
+		teamOneStartOver.value = newVal;
+	}
+);
 onMounted(() => {
-	caseData.teamOneOverLeft =
-		caseData.numberOfOvers - caseData.teamOneOverComplete;
+	// overLeft(47.1, 50);
 });
 </script>
+
 <style scoped lang="scss">
 .main {
 	display: flex;
@@ -377,46 +474,28 @@ onMounted(() => {
 	align-items: center;
 	justify-content: center;
 	.section-cases {
-		width: 80%;
-		.cases {
-			display: flex;
-			justify-content: space-between;
-			.case-types {
-				flex-basis: 35%;
+		.team {
+			.header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
 			}
-			.box {
-				flex-basis: 60%;
-			}
-			.case-types {
-				h1 {
-					text-align: center;
-					font-size: 18px;
-				}
-				ul {
-					margin: 0;
-					display: flex;
-					flex-direction: column;
-					li {
-						padding: 10px;
-						color: var(--primary-color);
-						cursor: pointer;
-						&:hover {
-							background: var(--pink-ball-color);
-							color: #fff;
-						}
-						&.active {
-							background: var(--pink-ball-color);
-							color: #fff;
-						}
+			.content {
+				.delayed-inputs {
+					background: #ddd;
+					color: #222;
+					&.active {
+						background: #222;
+						color: #fff;
 					}
 				}
-			}
-			.inputs {
-				display: flex;
-				flex-direction: column;
-				flex-wrap: wrap;
-				input {
-					flex-basis: 48%;
+				.resource-box {
+					.resource-update {
+						&.active {
+							border-color: var(--pink-ball-color);
+							box-shadow: 0px 0px 8px var(--pink-ball-color);
+						}
+					}
 				}
 			}
 		}
