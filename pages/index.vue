@@ -2,16 +2,32 @@
 	<div class="main py-50">
 		<h1>Cricket DLS <abbr>(Duckworth Lewis Stern)</abbr> method</h1>
 		<section class="section-cases">
+			<div class="match-type">
+				<input
+					id="fiftyOver"
+					type="radio"
+					:value="50"
+					v-model="matchType"
+				/><label for="fiftyOver">50 Over</label>
+				<input
+					id="twentyTwenty"
+					type="radio"
+					:value="20"
+					v-model="matchType"
+				/><label for="twentyTwenty">T20 </label>
+			</div>
 			<div class="team">
 				<div class="header">
 					<h6>team 1</h6>
-					<input
-						id="team1Delay"
-						type="checkbox"
-						value="0"
-						v-model="teamOneDelay"
-					/>
-					<label for="team1Delay">delay</label>
+					<div>
+						<input
+							id="team1Delay"
+							type="checkbox"
+							value="0"
+							v-model="teamOneDelay"
+						/>
+						<label for="team1Delay">delay</label>
+					</div>
 				</div>
 				<div class="content">
 					<div>
@@ -23,6 +39,20 @@
 							v-model="teamOneStartOver"
 							:disabled="teamOneDelay"
 						/>
+						<div class="emoticons">
+							<span v-if="matchType === 0 && teamOneStartOver !== 50">
+								&#129300;
+							</span>
+							<span v-else-if="matchType === 0 && teamOneStartOver > 50">
+								&#128563;
+							</span>
+							<span v-else-if="matchType === 1 && teamOneStartOver !== 20">
+								&#129300;
+							</span>
+							<span v-else-if="matchType === 1 && teamOneStartOver > 20">
+								&#128563;
+							</span>
+						</div>
 					</div>
 					<div>
 						<label for="teamOneScore">Team 1 score</label>
@@ -87,16 +117,21 @@
 			<div class="team">
 				<div class="header">
 					<h6>
-						team 2 <strong v-if="revisedScore">{{ revisedScore }}</strong>
+						team 2
+						<strong v-if="revisedScore"
+							>Revised Score: {{ revisedScore }}</strong
+						>
 						<button @click="calculateRevisedScore">R</button>
 					</h6>
-					<input
-						id="team2Delay"
-						type="checkbox"
-						value="1"
-						v-model="teamTwoDelay"
-					/>
-					<label for="team2Delay">delay</label>
+					<div>
+						<input
+							id="team2Delay"
+							type="checkbox"
+							value="1"
+							v-model="teamTwoDelay"
+						/>
+						<label for="team2Delay">delay</label>
+					</div>
 				</div>
 				<div class="content">
 					<div>
@@ -165,6 +200,8 @@
 import adjustedTable from "../utils/adjustedTable.json";
 import { overLeft, isMidOver, getAdjustedTableType } from "../utils/utils";
 const G50 = 245;
+
+var matchType = ref(50);
 
 var teamOneDelay = ref(false);
 // var totalDelayTeamOne = ref(0);
@@ -417,6 +454,12 @@ watch(
 			(el) => el.overs === Number(teamTwoStartOver.value)
 		);
 		teamTwoFinalResource.value = percentageObj["0"];
+	}
+);
+watch(
+	() => matchType.value,
+	(newVal, oldVal) => {
+		teamOneStartOver.value = newVal;
 	}
 );
 onMounted(() => {
