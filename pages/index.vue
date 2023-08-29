@@ -192,6 +192,12 @@
 					</div>
 				</div>
 			</div>
+			<div class="my-20">
+				Design & Develop by
+				<a href="https://github.com/Miltonbhowmick" target="_blank"
+					>miltonbhowmick</a
+				>
+			</div>
 		</section>
 	</div>
 </template>
