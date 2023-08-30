@@ -108,7 +108,7 @@
 							v-if="teamOneDelay === true"
 							@click="increaseDelay((team = 1))"
 						>
-							v
+							Add new delay
 						</button>
 						<!-- <div>
 							<label for="teamOneWickets">Team 1 wickets</label>
@@ -127,20 +127,14 @@
 								class="resource-update"
 								:class="{ active: isTeamOneUpdatedResource === true }"
 							>
-								U
+								Update
 							</button>
 						</div>
 					</div>
 				</div>
 				<div class="team">
 					<div class="header">
-						<h6>
-							team 2
-							<strong v-if="revisedScore"
-								>Revised Score: {{ revisedScore }}</strong
-							>
-							<button @click="calculateRevisedScore">R</button>
-						</h6>
+						<h6>team 2</h6>
 						<div>
 							<input
 								id="team2Delay"
@@ -152,6 +146,12 @@
 						</div>
 					</div>
 					<div class="content">
+						<div>
+							<button @click="calculateRevisedScore">Revised Score</button>
+							<strong v-if="revisedScore"
+								>Revised Score: {{ revisedScore }}</strong
+							>
+						</div>
 						<div>
 							<label for="overs">Match start at overs</label>
 							<input
@@ -193,7 +193,7 @@
 								v-if="teamTwoDelay === true"
 								@click="increaseDelay((team = 2))"
 							>
-								v
+								Add new delay
 							</button>
 							<div class="resource-box">
 								<label for="teamTwoResource">Team 2 resource</label>
@@ -208,7 +208,7 @@
 									class="resource-update"
 									:class="{ active: isTeamTwoUpdatedResource === true }"
 								>
-									U
+									Update
 								</button>
 							</div>
 						</div>
@@ -252,9 +252,19 @@ const increaseDelay = (team) => {
 		appliedResource: false,
 	};
 	if (team === 1) {
+		var ln = teamOneDelayList.value.length;
+		if (ln > 0 && teamOneDelayList.value[ln - 1].appliedResource === false) {
+			console.log("TEAM 1: Please update the current delay fields first!");
+			return;
+		}
 		teamOneDelayList.value.push(delayObj);
 		isTeamOneUpdatedResource.value = true;
 	} else if (team === 2) {
+		var ln = teamTwoDelayList.value.length;
+		if (ln > 0 && teamTwoDelayList.value[ln - 1].appliedResource === false) {
+			console.log("TEAM 2: Please update the current delay fields first!");
+			return;
+		}
 		teamTwoDelayList.value.push(delayObj);
 		isTeamTwoUpdatedResource.value = true;
 	}
@@ -524,7 +534,7 @@ onMounted(() => {
 					gap: 10px;
 					.delayed-inputs {
 						input {
-							width: 55px;
+							width: 80px;
 							text-align: center;
 						}
 						&.active {
