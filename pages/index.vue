@@ -306,6 +306,13 @@ const updateTeamOneResource = () => {
 			return;
 		}
 		if (
+			teamOneDelayList.value[ln - 1].over >= teamOneStartOver.value ||
+			teamOneDelayList.value[ln - 1].finalOverKey > teamOneStartOver.value
+		) {
+			console.log("TEAM 1: Please set delay over under the match start over");
+			return;
+		}
+		if (
 			teamOneDelayList.value[ln - 1].over >=
 			teamOneDelayList.value[ln - 1].finalOverKey
 		) {
@@ -314,11 +321,26 @@ const updateTeamOneResource = () => {
 			);
 			return;
 		}
+		if (teamOneDelayList.value[ln - 1].appliedResource === true) {
+			console.log("TEAM 1: Last delay is already updated");
+			return;
+		}
 
 		var appropriateOver = teamOneStartOver.value;
 		if (teamOneDelayList.value.length > 1) {
 			appropriateOver = teamOneDelayList.value[ln - 2].finalOverKey;
 		}
+
+		if (
+			appropriateOver < teamOneDelayList.value[ln - 1].finalOverKey ||
+			appropriateOver < teamOneDelayList.value[ln - 1].over
+		) {
+			console.log(
+				"TEAM 1: Current delay overs must be under last delay final over"
+			);
+			return;
+		}
+
 		// Team 1 suspension percentage
 		var table =
 			adjustedTable[
@@ -376,6 +398,14 @@ const updateTeamTwoResource = () => {
 			return;
 		}
 		if (
+			teamTwoDelayList.value[ln - 1].over >= teamTwoStartOver.value ||
+			teamTwoDelayList.value[ln - 1].finalOverKey > teamTwoStartOver.value
+		) {
+			console.log("TEAM 2: Please set delay over under the match start over");
+			return;
+		}
+
+		if (
 			teamTwoDelayList.value[ln - 1].over >=
 			teamTwoDelayList.value[ln - 1].finalOverKey
 		) {
@@ -384,11 +414,26 @@ const updateTeamTwoResource = () => {
 			);
 			return;
 		}
+		if (teamTwoDelayList.value[ln - 1].appliedResource === true) {
+			console.log("TEAM 2: Last delay is already updated");
+			return;
+		}
 
 		var appropriateOver = teamTwoStartOver.value;
 		if (teamTwoDelayList.value.length > 1) {
 			appropriateOver = teamTwoDelayList.value[ln - 2].finalOverKey;
 		}
+
+		if (
+			appropriateOver < teamTwoDelayList.value[ln - 1].finalOverKey ||
+			appropriateOver < teamTwoDelayList.value[ln - 1].over
+		) {
+			console.log(
+				"TEAM 2: Current delay overs must be under last delay final over"
+			);
+			return;
+		}
+
 		// Team 2 suspension percentage
 		var table =
 			adjustedTable[
