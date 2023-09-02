@@ -553,6 +553,9 @@ onMounted(() => {
 	justify-content: center;
 	.title {
 		margin: 0;
+		@media (max-width: 769px) {
+			text-align: center;
+		}
 	}
 	.developer-signature {
 	}
@@ -596,6 +599,10 @@ onMounted(() => {
 						}
 					}
 				}
+			}
+			@media (max-width: 769px) {
+				flex-direction: column;
+				align-items: center;
 			}
 		}
 	}
