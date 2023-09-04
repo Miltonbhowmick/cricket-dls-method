@@ -29,3 +29,52 @@ ul {
 .my-20{
 	margin: 20px 0;
 }
+
+
+// Toast notification customization
+.Vue-Toastification__container {
+	@media (max-width: 600px) {
+		left: 150px !important;
+	}
+	@media (max-width: 431px) {
+		left: 95px !important;
+	}
+	@media (max-width: 396px) {
+		left: 65px !important;
+	}
+	@media (max-width: 376px) {
+		left: 35px !important;
+	}
+}
+.Vue-Toastification__container{
+	z-index: 99999 !important;
+}
+.Vue-Toastification__toast{
+	// height: 35px;
+	padding: 15px 24px;
+	@media (max-width: 600px) {
+		width: 70%!important;
+		min-height: 40px!important;
+		padding: 10px 24px!important;
+	}
+}
+.Vue-Toastification__toast--info{
+	border-radius: 45px !important;
+}
+.Vue-Toastification__toast--success{
+	background-color: #323448 !important;
+	border-radius: 45px !important;
+}
+.Vue-Toastification__toast--error{
+	background: rgba(253, 13, 0, 0.8)!important;
+	border-radius: 45px !important;
+}
+.Vue-Toastification__toast-body {
+	font-size: 14px;
+	@media (max-width: 600px) {
+		font-size: 12px !important;
+	}
+	@media (max-width: 431px) {
+		font-size: 11px !important;
+	}
+}

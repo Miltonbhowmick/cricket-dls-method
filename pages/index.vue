@@ -159,6 +159,7 @@
 								id="overs"
 								placeholder="Match start overs"
 								v-model="teamTwoStartOver"
+								:disabled="teamTwoDelay"
 							/>
 						</div>
 						<div class="content">
@@ -222,6 +223,9 @@
 <script setup>
 import adjustedTable from "../utils/adjustedTable.json";
 import { overLeft, isMidOver, getAdjustedTableType } from "../utils/utils";
+import { useToast } from "vue-toastification";
+
+const toast = useToast();
 const G50 = 245;
 
 var matchType = ref(50);
@@ -303,6 +307,7 @@ const updateTeamOneResource = () => {
 			teamOneDelayList.value[ln - 1].wicketsFallKey === 0
 		) {
 			console.log("TEAM 1: Please set delay inputs");
+			toast.error("TEAM 1: Please set delay inputs");
 			return;
 		}
 		if (
