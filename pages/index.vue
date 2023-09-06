@@ -1,5 +1,5 @@
 <template>
-	<div class="main py-50">
+	<div class="main">
 		<h1 class="title">
 			Cricket DLS <abbr>(Duckworth Lewis Stern)</abbr> method
 		</h1>
@@ -31,8 +31,8 @@
 			<div class="match">
 				<div class="team">
 					<div class="header">
-						<h6>team 1</h6>
-						<div>
+						<h2 class="team-no">team 1</h2>
+						<div class="delay-checkbox">
 							<input
 								id="team1Delay"
 								type="checkbox"
@@ -43,12 +43,12 @@
 						</div>
 					</div>
 					<div class="content">
-						<div>
-							<label for="overs">Match start at overs</label>
+						<div class="input-group">
+							<label for="overs" class="label">Match starts at overs</label>
 							<input
 								type="number"
 								id="overs"
-								placeholder="Match start overs"
+								placeholder="Match starts overs"
 								v-model="teamOneStartOver"
 								:disabled="teamOneDelay"
 							/>
@@ -67,7 +67,7 @@
 								</span>
 							</div>
 						</div>
-						<div>
+						<div class="input-group">
 							<label for="teamOneScore">Team 1 score</label>
 							<input
 								type="number"
@@ -77,36 +77,43 @@
 							/>
 						</div>
 
-						<div
-							v-for="(item, index) in teamOneDelayList"
-							:key="index"
-							class="delayed-inputs"
-						>
-							<input
-								type="number"
-								placeholder="Complete over"
-								v-model="teamOneDelayList[index].over"
-								:disabled="item.appliedResource"
-							/>
-							<input
-								type="number"
-								placeholder="Cut and final over"
-								v-model="teamOneDelayList[index].finalOverKey"
-								:disabled="item.appliedResource"
-							/>
-							<input
-								type="number"
-								id="teamOneWickets"
-								placeholder="Team one wicket"
-								min="9"
-								v-model="teamOneDelayList[index].wicketsFallKey"
-								:disabled="item.appliedResource"
-							/>
+						<div class="multiple-input-group">
+							<div v-if="teamOneDelayList.length > 0" class="delayed-labels">
+								<span>Complete over</span>
+								<span>New final over</span>
+								<span>Wicket lost</span>
+							</div>
+							<div
+								v-for="(item, index) in teamOneDelayList"
+								:key="index"
+								class="delayed-inputs"
+							>
+								<input
+									type="number"
+									placeholder="Complete over"
+									v-model="teamOneDelayList[index].over"
+									:disabled="item.appliedResource"
+								/>
+								<input
+									type="number"
+									placeholder="Cut and final over"
+									v-model="teamOneDelayList[index].finalOverKey"
+									:disabled="item.appliedResource"
+								/>
+								<input
+									type="number"
+									id="teamOneWickets"
+									placeholder="Team one wicket"
+									min="9"
+									v-model="teamOneDelayList[index].wicketsFallKey"
+									:disabled="item.appliedResource"
+								/>
+							</div>
 						</div>
-						<br />
 						<button
 							v-if="teamOneDelay === true"
 							@click="increaseDelay((team = 1))"
+							class="mt-30"
 						>
 							Add new delay
 						</button>
@@ -114,7 +121,7 @@
 							<label for="teamOneWickets">Team 1 wickets</label>
 							<input id="teamOneWickets" placeholder="Team one wicket" />
 						</div> -->
-						<div class="resource-box">
+						<div class="resource-box inline-input-group">
 							<label for="teamOneResource">Team 1 resource</label>
 							<input
 								id="teamOneResource"
@@ -134,8 +141,8 @@
 				</div>
 				<div class="team">
 					<div class="header">
-						<h6>team 2</h6>
-						<div>
+						<h2 class="team-no">team 2</h2>
+						<div class="delay-checkbox">
 							<input
 								id="team2Delay"
 								type="checkbox"
@@ -146,22 +153,33 @@
 						</div>
 					</div>
 					<div class="content">
-						<div>
-							<button @click="calculateRevisedScore">Revised Score</button>
-							<strong v-if="revisedScore"
-								>Revised Score: {{ revisedScore }}</strong
-							>
-						</div>
-						<div>
-							<label for="overs">Match start at overs</label>
+						<div class="input-group">
+							<label for="overs">Match starts at overs</label>
 							<input
 								type="number"
 								id="overs"
-								placeholder="Match start overs"
+								placeholder="Match starts overs"
 								v-model="teamTwoStartOver"
+								:disabled="teamTwoDelay"
 							/>
 						</div>
-						<div class="content">
+						<div class="input-group">
+							<label class="label">Calculate revised target</label>
+							<div class="revised-score-box">
+								<button @click="calculateRevisedScore" class="revised-button">
+									Generate
+								</button>
+								<span v-if="revisedScore" class="revised-score"
+									>Target: {{ revisedScore }}</span
+								>
+							</div>
+						</div>
+						<div class="multiple-input-group">
+							<div v-if="teamTwoDelayList.length > 0" class="delayed-labels">
+								<span>Complete over</span>
+								<span>New final over</span>
+								<span>Wicket lost</span>
+							</div>
 							<div
 								v-for="(item, index) in teamTwoDelayList"
 								:key="index"
@@ -188,29 +206,29 @@
 									:disabled="item.appliedResource"
 								/>
 							</div>
-							<br />
+						</div>
+						<button
+							v-if="teamTwoDelay === true"
+							@click="increaseDelay((team = 2))"
+							class="mt-30"
+						>
+							Add new delay
+						</button>
+						<div class="resource-box inline-input-group">
+							<label for="teamTwoResource">Team 2 resource</label>
+							<input
+								id="teamTwoResource"
+								placeholder="Team Two resource, R1"
+								disabled
+								v-model="teamTwoFinalResource"
+							/>
 							<button
-								v-if="teamTwoDelay === true"
-								@click="increaseDelay((team = 2))"
+								@click="updateTeamTwoResource"
+								class="resource-update"
+								:class="{ active: isTeamTwoUpdatedResource === true }"
 							>
-								Add new delay
+								Update
 							</button>
-							<div class="resource-box">
-								<label for="teamTwoResource">Team 2 resource</label>
-								<input
-									id="teamTwoResource"
-									placeholder="Team Two resource, R1"
-									disabled
-									v-model="teamTwoFinalResource"
-								/>
-								<button
-									@click="updateTeamTwoResource"
-									class="resource-update"
-									:class="{ active: isTeamTwoUpdatedResource === true }"
-								>
-									Update
-								</button>
-							</div>
 						</div>
 					</div>
 				</div>
@@ -222,6 +240,9 @@
 <script setup>
 import adjustedTable from "../utils/adjustedTable.json";
 import { overLeft, isMidOver, getAdjustedTableType } from "../utils/utils";
+import { useToast } from "vue-toastification";
+
+const toast = useToast();
 const G50 = 245;
 
 var matchType = ref(50);
@@ -254,7 +275,7 @@ const increaseDelay = (team) => {
 	if (team === 1) {
 		var ln = teamOneDelayList.value.length;
 		if (ln > 0 && teamOneDelayList.value[ln - 1].appliedResource === false) {
-			console.log("TEAM 1: Please update the current delay fields first!");
+			toast.error("TEAM 1: Please update the current delay fields first!");
 			return;
 		}
 		teamOneDelayList.value.push(delayObj);
@@ -262,7 +283,7 @@ const increaseDelay = (team) => {
 	} else if (team === 2) {
 		var ln = teamTwoDelayList.value.length;
 		if (ln > 0 && teamTwoDelayList.value[ln - 1].appliedResource === false) {
-			console.log("TEAM 2: Please update the current delay fields first!");
+			toast.error("TEAM 2: Please update the current delay fields first!");
 			return;
 		}
 		teamTwoDelayList.value.push(delayObj);
@@ -302,27 +323,27 @@ const updateTeamOneResource = () => {
 			teamOneDelayList.value[ln - 1].finalOverKey === 0 &&
 			teamOneDelayList.value[ln - 1].wicketsFallKey === 0
 		) {
-			console.log("TEAM 1: Please set delay inputs");
+			toast.error("TEAM 1: Please set delay inputs");
 			return;
 		}
 		if (
 			teamOneDelayList.value[ln - 1].over >= teamOneStartOver.value ||
 			teamOneDelayList.value[ln - 1].finalOverKey > teamOneStartOver.value
 		) {
-			console.log("TEAM 1: Please set delay over under the match start over");
+			toast.error("TEAM 1: Please set delay over under the match start over");
 			return;
 		}
 		if (
 			teamOneDelayList.value[ln - 1].over >=
 			teamOneDelayList.value[ln - 1].finalOverKey
 		) {
-			console.log(
+			toast.error(
 				"TEAM 1: complete over must be less than final over after disturbance(rain etc)"
 			);
 			return;
 		}
 		if (teamOneDelayList.value[ln - 1].appliedResource === true) {
-			console.log("TEAM 1: Last delay is already updated");
+			toast.error("TEAM 1: Last delay is already updated");
 			return;
 		}
 
@@ -335,7 +356,7 @@ const updateTeamOneResource = () => {
 			appropriateOver < teamOneDelayList.value[ln - 1].finalOverKey ||
 			appropriateOver < teamOneDelayList.value[ln - 1].over
 		) {
-			console.log(
+			toast.error(
 				"TEAM 1: Current delay overs must be under last delay final over"
 			);
 			return;
@@ -394,14 +415,14 @@ const updateTeamTwoResource = () => {
 			teamTwoDelayList.value[ln - 1].finalOverKey === 0 &&
 			teamTwoDelayList.value[ln - 1].wicketsFallKey === 0
 		) {
-			console.log("TEAM 2: Please set delay inputs");
+			toast.error("TEAM 2: Please set delay inputs");
 			return;
 		}
 		if (
 			teamTwoDelayList.value[ln - 1].over >= teamTwoStartOver.value ||
 			teamTwoDelayList.value[ln - 1].finalOverKey > teamTwoStartOver.value
 		) {
-			console.log("TEAM 2: Please set delay over under the match start over");
+			toast.error("TEAM 2: Please set delay over under the match start over");
 			return;
 		}
 
@@ -409,13 +430,13 @@ const updateTeamTwoResource = () => {
 			teamTwoDelayList.value[ln - 1].over >=
 			teamTwoDelayList.value[ln - 1].finalOverKey
 		) {
-			console.log(
+			toast.error(
 				"TEAM 2: complete over must be less than final over after disturbance(rain etc)"
 			);
 			return;
 		}
 		if (teamTwoDelayList.value[ln - 1].appliedResource === true) {
-			console.log("TEAM 2: Last delay is already updated");
+			toast.error("TEAM 2: Last delay is already updated");
 			return;
 		}
 
@@ -428,7 +449,7 @@ const updateTeamTwoResource = () => {
 			appropriateOver < teamTwoDelayList.value[ln - 1].finalOverKey ||
 			appropriateOver < teamTwoDelayList.value[ln - 1].over
 		) {
-			console.log(
+			toast.error(
 				"TEAM 2: Current delay overs must be under last delay final over"
 			);
 			return;
@@ -547,20 +568,27 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .main {
+	padding: 50px 15px;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
 	.title {
 		margin: 0;
+		font-size: 36px;
+		font-weight: 600;
 		@media (max-width: 769px) {
 			text-align: center;
+		}
+		@media (max-width: 576px) {
+			font-size: 24px;
+			font-weight: 500;
 		}
 	}
 	.developer-signature {
 	}
 	.section-cases {
-		width: 50%;
+		width: 60%;
 		.match-type {
 			display: flex;
 			justify-content: center;
@@ -568,26 +596,89 @@ onMounted(() => {
 		}
 		.match {
 			display: flex;
-			justify-content: center;
-			gap: 40px;
+			justify-content: space-between;
+			gap: 50px;
 			.team {
+				width: 100%;
 				.header {
 					display: flex;
 					justify-content: flex-start;
 					align-items: center;
+					.team-no {
+						font-size: 16px;
+						font-weight: 400;
+					}
 				}
 				.content {
 					display: flex;
 					flex-direction: column;
 					gap: 10px;
-					.delayed-inputs {
-						input {
-							width: 80px;
-							text-align: center;
+					.input-group {
+						display: flex;
+						flex-direction: column;
+						gap: 3px;
+						.label {
+							font-size: 16px;
+							font-weight: 400;
 						}
-						&.active {
-							background: #222;
-							color: #fff;
+						input {
+							width: 100%;
+							padding: 8px;
+							border: 1px solid var(--primary-color);
+							border-radius: 4px;
+							box-sizing: border-box;
+						}
+						.revised-score-box {
+							display: flex;
+							justify-content: flex-start;
+							align-items: center;
+							gap: 5px;
+							.revised-button {
+								padding: 8px 10px;
+							}
+							.revised-score {
+								font-size: 14px;
+							}
+						}
+					}
+					.multiple-input-group {
+						display: flex;
+						flex-direction: column;
+						gap: 5px;
+						.delayed-labels {
+							display: flex;
+							justify-content: space-between;
+							gap: 4px;
+							span {
+								width: 100%;
+								font-size: 12px;
+								text-align: center;
+							}
+						}
+						.delayed-inputs {
+							display: flex;
+							justify-content: space-between;
+							gap: 4px;
+							input {
+								width: 100%;
+								padding: 2px;
+								text-align: center;
+								border: 1px solid var(--primary-color);
+								border-radius: 4px;
+							}
+							&.active {
+								background: #222;
+								color: #fff;
+							}
+						}
+					}
+
+					.inline-input-group {
+						display: flex;
+						justify-content: space-between;
+						gap: 3px;
+						@media (max-width: 769px) {
+							flex-direction: column;
 						}
 					}
 					.resource-box {
@@ -603,8 +694,15 @@ onMounted(() => {
 			@media (max-width: 769px) {
 				flex-direction: column;
 				align-items: center;
+				gap: 20px;
 			}
 		}
+		@media (max-width: 769px) {
+			width: 100%;
+		}
+	}
+	@media (max-width: 769px) {
+		padding: 15px;
 	}
 }
 </style>
