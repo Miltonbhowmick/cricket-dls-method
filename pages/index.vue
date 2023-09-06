@@ -258,7 +258,7 @@ const increaseDelay = (team) => {
 	if (team === 1) {
 		var ln = teamOneDelayList.value.length;
 		if (ln > 0 && teamOneDelayList.value[ln - 1].appliedResource === false) {
-			console.log("TEAM 1: Please update the current delay fields first!");
+			toast.error("TEAM 1: Please update the current delay fields first!");
 			return;
 		}
 		teamOneDelayList.value.push(delayObj);
@@ -266,7 +266,7 @@ const increaseDelay = (team) => {
 	} else if (team === 2) {
 		var ln = teamTwoDelayList.value.length;
 		if (ln > 0 && teamTwoDelayList.value[ln - 1].appliedResource === false) {
-			console.log("TEAM 2: Please update the current delay fields first!");
+			toast.error("TEAM 2: Please update the current delay fields first!");
 			return;
 		}
 		teamTwoDelayList.value.push(delayObj);
@@ -306,7 +306,6 @@ const updateTeamOneResource = () => {
 			teamOneDelayList.value[ln - 1].finalOverKey === 0 &&
 			teamOneDelayList.value[ln - 1].wicketsFallKey === 0
 		) {
-			console.log("TEAM 1: Please set delay inputs");
 			toast.error("TEAM 1: Please set delay inputs");
 			return;
 		}
@@ -314,20 +313,20 @@ const updateTeamOneResource = () => {
 			teamOneDelayList.value[ln - 1].over >= teamOneStartOver.value ||
 			teamOneDelayList.value[ln - 1].finalOverKey > teamOneStartOver.value
 		) {
-			console.log("TEAM 1: Please set delay over under the match start over");
+			toast.error("TEAM 1: Please set delay over under the match start over");
 			return;
 		}
 		if (
 			teamOneDelayList.value[ln - 1].over >=
 			teamOneDelayList.value[ln - 1].finalOverKey
 		) {
-			console.log(
+			toast.error(
 				"TEAM 1: complete over must be less than final over after disturbance(rain etc)"
 			);
 			return;
 		}
 		if (teamOneDelayList.value[ln - 1].appliedResource === true) {
-			console.log("TEAM 1: Last delay is already updated");
+			toast.error("TEAM 1: Last delay is already updated");
 			return;
 		}
 
@@ -340,7 +339,7 @@ const updateTeamOneResource = () => {
 			appropriateOver < teamOneDelayList.value[ln - 1].finalOverKey ||
 			appropriateOver < teamOneDelayList.value[ln - 1].over
 		) {
-			console.log(
+			toast.error(
 				"TEAM 1: Current delay overs must be under last delay final over"
 			);
 			return;
@@ -399,14 +398,14 @@ const updateTeamTwoResource = () => {
 			teamTwoDelayList.value[ln - 1].finalOverKey === 0 &&
 			teamTwoDelayList.value[ln - 1].wicketsFallKey === 0
 		) {
-			console.log("TEAM 2: Please set delay inputs");
+			toast.error("TEAM 2: Please set delay inputs");
 			return;
 		}
 		if (
 			teamTwoDelayList.value[ln - 1].over >= teamTwoStartOver.value ||
 			teamTwoDelayList.value[ln - 1].finalOverKey > teamTwoStartOver.value
 		) {
-			console.log("TEAM 2: Please set delay over under the match start over");
+			toast.error("TEAM 2: Please set delay over under the match start over");
 			return;
 		}
 
@@ -414,13 +413,13 @@ const updateTeamTwoResource = () => {
 			teamTwoDelayList.value[ln - 1].over >=
 			teamTwoDelayList.value[ln - 1].finalOverKey
 		) {
-			console.log(
+			toast.error(
 				"TEAM 2: complete over must be less than final over after disturbance(rain etc)"
 			);
 			return;
 		}
 		if (teamTwoDelayList.value[ln - 1].appliedResource === true) {
-			console.log("TEAM 2: Last delay is already updated");
+			toast.error("TEAM 2: Last delay is already updated");
 			return;
 		}
 
@@ -433,7 +432,7 @@ const updateTeamTwoResource = () => {
 			appropriateOver < teamTwoDelayList.value[ln - 1].finalOverKey ||
 			appropriateOver < teamTwoDelayList.value[ln - 1].over
 		) {
-			console.log(
+			toast.error(
 				"TEAM 2: Current delay overs must be under last delay final over"
 			);
 			return;
