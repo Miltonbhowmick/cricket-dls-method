@@ -31,7 +31,7 @@
 			<div class="match">
 				<div class="team">
 					<div class="header">
-						<h2 class="team-no">team 1</h2>
+						<h2 class="team-no">Team 1</h2>
 						<div class="delay-checkbox">
 							<input
 								id="team1Delay"
@@ -39,7 +39,7 @@
 								value="0"
 								v-model="teamOneDelay"
 							/>
-							<label for="team1Delay">delay</label>
+							<label for="team1Delay">Any delay occured</label>
 						</div>
 					</div>
 					<div class="content">
@@ -113,7 +113,7 @@
 						<button
 							v-if="teamOneDelay === true"
 							@click="increaseDelay((team = 1))"
-							class="mt-30"
+							class="mt-30 add-delay-button"
 						>
 							Add new delay
 						</button>
@@ -121,7 +121,7 @@
 							<label for="teamOneWickets">Team 1 wickets</label>
 							<input id="teamOneWickets" placeholder="Team one wicket" />
 						</div> -->
-						<div class="resource-box inline-input-group">
+						<div class="resource-box inline-input-group mt-10">
 							<label for="teamOneResource">Team 1 resource</label>
 							<input
 								id="teamOneResource"
@@ -141,7 +141,7 @@
 				</div>
 				<div class="team">
 					<div class="header">
-						<h2 class="team-no">team 2</h2>
+						<h2 class="team-no">Team 2</h2>
 						<div class="delay-checkbox">
 							<input
 								id="team2Delay"
@@ -149,7 +149,7 @@
 								value="1"
 								v-model="teamTwoDelay"
 							/>
-							<label for="team2Delay">delay</label>
+							<label for="team2Delay">Any delay occured</label>
 						</div>
 					</div>
 					<div class="content">
@@ -210,11 +210,11 @@
 						<button
 							v-if="teamTwoDelay === true"
 							@click="increaseDelay((team = 2))"
-							class="mt-30"
+							class="mt-30 add-delay-button"
 						>
 							Add new delay
 						</button>
-						<div class="resource-box inline-input-group">
+						<div class="resource-box inline-input-group mt-10">
 							<label for="teamTwoResource">Team 2 resource</label>
 							<input
 								id="teamTwoResource"
@@ -602,7 +602,7 @@ onMounted(() => {
 				width: 100%;
 				.header {
 					display: flex;
-					justify-content: flex-start;
+					justify-content: space-between;
 					align-items: center;
 					.team-no {
 						font-size: 16px;
@@ -635,6 +635,7 @@ onMounted(() => {
 							gap: 5px;
 							.revised-button {
 								padding: 8px 10px;
+								cursor: pointer;
 							}
 							.revised-score {
 								font-size: 14px;
@@ -677,12 +678,18 @@ onMounted(() => {
 						display: flex;
 						justify-content: space-between;
 						gap: 3px;
-						@media (max-width: 769px) {
-							flex-direction: column;
-						}
+					}
+					.add-delay-button {
+						padding: 2px 0;
+						border: 1px solid var(--primary-color);
+						border-radius: 4px;
+						cursor: pointer;
 					}
 					.resource-box {
 						.resource-update {
+							cursor: pointer;
+							border: 1px solid var(--primary-color);
+							border-radius: 4px;
 							&.active {
 								border-color: var(--pink-ball-color);
 								box-shadow: 0px 0px 8px var(--pink-ball-color);
