@@ -9,6 +9,9 @@
 				>miltonbhowmick</a
 			>
 		</p>
+		<button @click="openGuidelineModal" class="guideline-button">
+			See guidelines
+		</button>
 		<section class="section-cases">
 			<div class="match-type">
 				<div class="type-box">
@@ -234,17 +237,25 @@
 				</div>
 			</div>
 		</section>
+		<ErrorModal
+			:modalOpen="showErrorModal"
+			:errorText="helpText"
+			@hideModal="hideErrorModal"
+		/>
+		<GuidelineModal
+			:modalOpen="showGuidelineModal"
+			@hideModal="hideGuidelineModal"
+		/>
 	</div>
 </template>
 
 <script setup>
 import adjustedTable from "../utils/adjustedTable.json";
 import { overLeft, isMidOver, getAdjustedTableType } from "../utils/utils";
-import { useToast } from "vue-toastification";
 
-const toast = useToast();
 const G50 = 245;
 
+var helpText = ref("");
 var matchType = ref(50);
 
 var teamOneDelay = ref(false);
@@ -265,6 +276,30 @@ var isTeamTwoUpdatedResource = ref(false);
 
 var revisedScore = ref(0);
 
+var showErrorModal = ref(false);
+
+var showGuidelineModal = ref(false);
+
+const openGuidelineModal = () => {
+	showGuidelineModal.value = true;
+};
+const hideGuidelineModal = () => {
+	showGuidelineModal.value = false;
+};
+
+const hideErrorModal = (hideType) => {
+	showErrorModal.value = false;
+	if (hideType === "guideline") {
+		openGuidelineModal();
+	}
+};
+const openErrorModal = (text = null) => {
+	if (text) {
+		helpText.value = text;
+	}
+	showErrorModal.value = true;
+};
+
 const increaseDelay = (team) => {
 	var delayObj = {
 		over: 0,
@@ -275,7 +310,7 @@ const increaseDelay = (team) => {
 	if (team === 1) {
 		var ln = teamOneDelayList.value.length;
 		if (ln > 0 && teamOneDelayList.value[ln - 1].appliedResource === false) {
-			toast.error("TEAM 1: Please update the current delay fields first!");
+			openErrorModal("TEAM 1: Please update the current delay fields first!");
 			return;
 		}
 		teamOneDelayList.value.push(delayObj);
@@ -283,7 +318,7 @@ const increaseDelay = (team) => {
 	} else if (team === 2) {
 		var ln = teamTwoDelayList.value.length;
 		if (ln > 0 && teamTwoDelayList.value[ln - 1].appliedResource === false) {
-			toast.error("TEAM 2: Please update the current delay fields first!");
+			openErrorModal("TEAM 2: Please update the current delay fields first!");
 			return;
 		}
 		teamTwoDelayList.value.push(delayObj);
@@ -323,27 +358,29 @@ const updateTeamOneResource = () => {
 			teamOneDelayList.value[ln - 1].finalOverKey === 0 &&
 			teamOneDelayList.value[ln - 1].wicketsFallKey === 0
 		) {
-			toast.error("TEAM 1: Please set delay inputs");
+			openErrorModal("TEAM 1: Please set delay inputs");
 			return;
 		}
 		if (
 			teamOneDelayList.value[ln - 1].over >= teamOneStartOver.value ||
 			teamOneDelayList.value[ln - 1].finalOverKey > teamOneStartOver.value
 		) {
-			toast.error("TEAM 1: Please set delay over under the match start over");
+			openErrorModal(
+				"TEAM 1: Please set delay over under the match start over"
+			);
 			return;
 		}
 		if (
 			teamOneDelayList.value[ln - 1].over >=
 			teamOneDelayList.value[ln - 1].finalOverKey
 		) {
-			toast.error(
+			openErrorModal(
 				"TEAM 1: complete over must be less than final over after disturbance(rain etc)"
 			);
 			return;
 		}
 		if (teamOneDelayList.value[ln - 1].appliedResource === true) {
-			toast.error("TEAM 1: Last delay is already updated");
+			openErrorModal("TEAM 1: Last delay is already updated");
 			return;
 		}
 
@@ -356,7 +393,7 @@ const updateTeamOneResource = () => {
 			appropriateOver < teamOneDelayList.value[ln - 1].finalOverKey ||
 			appropriateOver < teamOneDelayList.value[ln - 1].over
 		) {
-			toast.error(
+			openErrorModal(
 				"TEAM 1: Current delay overs must be under last delay final over"
 			);
 			return;
@@ -415,14 +452,16 @@ const updateTeamTwoResource = () => {
 			teamTwoDelayList.value[ln - 1].finalOverKey === 0 &&
 			teamTwoDelayList.value[ln - 1].wicketsFallKey === 0
 		) {
-			toast.error("TEAM 2: Please set delay inputs");
+			openErrorModal("TEAM 2: Please set delay inputs");
 			return;
 		}
 		if (
 			teamTwoDelayList.value[ln - 1].over >= teamTwoStartOver.value ||
 			teamTwoDelayList.value[ln - 1].finalOverKey > teamTwoStartOver.value
 		) {
-			toast.error("TEAM 2: Please set delay over under the match start over");
+			openErrorModal(
+				"TEAM 2: Please set delay over under the match start over"
+			);
 			return;
 		}
 
@@ -430,13 +469,13 @@ const updateTeamTwoResource = () => {
 			teamTwoDelayList.value[ln - 1].over >=
 			teamTwoDelayList.value[ln - 1].finalOverKey
 		) {
-			toast.error(
+			openErrorModal(
 				"TEAM 2: complete over must be less than final over after disturbance(rain etc)"
 			);
 			return;
 		}
 		if (teamTwoDelayList.value[ln - 1].appliedResource === true) {
-			toast.error("TEAM 2: Last delay is already updated");
+			openErrorModal("TEAM 2: Last delay is already updated");
 			return;
 		}
 
@@ -449,7 +488,7 @@ const updateTeamTwoResource = () => {
 			appropriateOver < teamTwoDelayList.value[ln - 1].finalOverKey ||
 			appropriateOver < teamTwoDelayList.value[ln - 1].over
 		) {
-			toast.error(
+			openErrorModal(
 				"TEAM 2: Current delay overs must be under last delay final over"
 			);
 			return;
@@ -587,6 +626,19 @@ onMounted(() => {
 	}
 	.developer-signature {
 	}
+	.guideline-button {
+		margin-bottom: 30px;
+		padding: 8px 15px;
+		border: 1px solid var(--primary-color);
+		border-radius: 4px;
+		font-size: 16px;
+		font-weight: 600;
+		cursor: pointer;
+		&:hover {
+			background: var(--pink-ball-color);
+			color: #fff;
+		}
+	}
 	.section-cases {
 		width: 60%;
 		.match-type {
@@ -634,6 +686,8 @@ onMounted(() => {
 							align-items: center;
 							gap: 5px;
 							.revised-button {
+								border: 1px solid var(--primary-color);
+								border-radius: 4px;
 								padding: 8px 10px;
 								cursor: pointer;
 							}
