@@ -394,7 +394,17 @@ const updateTeamOneResource = () => {
 			appropriateOver < teamOneDelayList.value[ln - 1].over
 		) {
 			openErrorModal(
-				"TEAM 1: Current delay overs must be under last delay final over"
+				"TEAM 1: New delay final over must be under last delay final over"
+			);
+			return;
+		}
+		if (
+			ln > 1 &&
+			teamOneDelayList.value[ln - 1].wicketsFallKey <
+				teamOneDelayList.value[ln - 2].wicketsFallKey
+		) {
+			openErrorModal(
+				"TEAM 1: New delay wicket fall can not be less than the last delayed wicket fall"
 			);
 			return;
 		}
@@ -489,7 +499,17 @@ const updateTeamTwoResource = () => {
 			appropriateOver < teamTwoDelayList.value[ln - 1].over
 		) {
 			openErrorModal(
-				"TEAM 2: Current delay overs must be under last delay final over"
+				"TEAM 2:  New delay final over must be under last delay final over"
+			);
+			return;
+		}
+		if (
+			ln > 1 &&
+			teamTwoDelayList.value[ln - 1].wicketsFallKey <
+				teamTwoDelayList.value[ln - 2].wicketsFallKey
+		) {
+			openErrorModal(
+				"TEAM 2: New delay wicket fall can not be less than the last delayed wicket fall"
 			);
 			return;
 		}
@@ -548,6 +568,8 @@ watch(
 	(newVal, oldVal) => {
 		if (newVal === false) {
 			teamOneDelayList.value = [];
+			teamOneFinalResource.value = 100;
+			teamOneStartOver.value = matchType.value;
 			isTeamOneUpdatedResource.value = false;
 		} else {
 			isTeamOneUpdatedResource.value = true;
@@ -559,6 +581,8 @@ watch(
 	(newVal, oldVal) => {
 		if (newVal === false) {
 			teamTwoDelayList.value = [];
+			teamTwoFinalResource.value = 100;
+			teamTwoStartOver.value = matchType.value;
 			isTeamTwoUpdatedResource.value = false;
 		} else {
 			isTeamTwoUpdatedResource.value = true;
