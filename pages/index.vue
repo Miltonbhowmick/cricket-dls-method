@@ -548,6 +548,8 @@ watch(
 	(newVal, oldVal) => {
 		if (newVal === false) {
 			teamOneDelayList.value = [];
+			teamOneFinalResource.value = 100;
+			teamOneStartOver.value = matchType.value;
 			isTeamOneUpdatedResource.value = false;
 		} else {
 			isTeamOneUpdatedResource.value = true;
@@ -559,6 +561,8 @@ watch(
 	(newVal, oldVal) => {
 		if (newVal === false) {
 			teamTwoDelayList.value = [];
+			teamTwoFinalResource.value = 100;
+			teamTwoStartOver.value = matchType.value;
 			isTeamTwoUpdatedResource.value = false;
 		} else {
 			isTeamTwoUpdatedResource.value = true;
