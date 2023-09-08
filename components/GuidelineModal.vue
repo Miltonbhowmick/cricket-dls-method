@@ -115,7 +115,8 @@ const close = (event) => {
 		.close {
 			position: absolute;
 			top: 10px;
-			right: 10px;
+			right: 20px;
+			font-size: 25px;
 			color: black;
 			cursor: pointer;
 		}
@@ -131,6 +132,15 @@ const close = (event) => {
 					font-weight: 400;
 				}
 			}
+		}
+		@media (max-width: 769px) {
+			width: 450px;
+			height: 500px;
+		}
+		@media (max-width: 576px) {
+			margin: 10px;
+			width: 100%;
+			height: 400px;
 		}
 	}
 }
