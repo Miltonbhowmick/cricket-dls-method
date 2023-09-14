@@ -20,7 +20,6 @@ const props = defineProps({
 const emit = defineEmits();
 
 const close = (event) => {
-	console.log("errror box close");
 	if (
 		event === "guideline" ||
 		event.srcElement.className === "modal" ||
