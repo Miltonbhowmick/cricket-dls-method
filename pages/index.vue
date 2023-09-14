@@ -47,7 +47,7 @@
 					</div>
 					<div class="content">
 						<div class="input-group">
-							<label for="overs" class="label">Match starts at overs</label>
+							<label for="overs" class="label">Match starts for overs </label>
 							<input
 								type="number"
 								id="overs"
@@ -157,7 +157,7 @@
 					</div>
 					<div class="content">
 						<div class="input-group">
-							<label for="overs">Match starts at overs</label>
+							<label for="overs">Match starts for overs</label>
 							<input
 								type="number"
 								id="overs"
@@ -647,8 +647,6 @@ onMounted(() => {
 			font-size: 24px;
 			font-weight: 500;
 		}
-	}
-	.developer-signature {
 	}
 	.guideline-button {
 		margin-bottom: 30px;
