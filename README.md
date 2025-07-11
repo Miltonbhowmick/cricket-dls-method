@@ -67,3 +67,7 @@ Welcome, you contributions from the community! If you'd like to contribute to th
 ## License
 This project is licensed under the [MIT License](./LICENSE) - see the [LICENSE](./LICENSE) file for details.
 
+## ☕ Support
+👉 [**Buy me a coffee**](https://buymeacoffee.com/miltonbhowv)
+
+Your support means a lot and keeps me inspired to build and share more! 💛
