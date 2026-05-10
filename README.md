@@ -68,6 +68,13 @@ Welcome, you contributions from the community! If you'd like to contribute to th
 This project is licensed under the [MIT License](./LICENSE) - see the [LICENSE](./LICENSE) file for details.
 
 ## ☕ Support
-👉 [**Buy me a coffee**](https://buymeacoffee.com/miltonbhowv)
+<p>👉 [**Buy me a coffee**](https://buymeacoffee.com/miltonbhowv)</p>
+
+<p>You can also support via binance,</p>
+<p>Wallet Address:</p>
+<p>0xDa19317c155350D137802C53e64be7207561EACF</p>
+<img width="100" height="100" alt="WhatsApp Image 2026-05-10 at 14 34 11" src="https://github.com/user-attachments/assets/32747864-34d1-4e66-895a-5a26f9cc86a9" />
+
+
 
 Your support means a lot and keeps me inspired to build and share more! 💛
